@@ -18,24 +18,24 @@ class CASC(Competition):
     def __repr__(self):
         sb = []
         sb.append("competition mode: CASC")
-        sb.append("competition name: " + self.name)
-        sb.append("competition WC limit: " + str(self.wcLimit))
-        sb.append("competition CPU limit: " + str(self.cpuLimit))
+        sb.append("competition name: " + self._name)
+        sb.append("competition WC limit: " + str(self._wcLimit))
+        sb.append("competition CPU limit: " + str(self._cpuLimit))
         sb.append("competition reasoners:")
-        sb.extend(sorted(list(map(lambda s: '    ' + s.getName(), self.solvers))))
+        sb.extend(sorted(list(map(lambda s: '    ' + s.name(), self._solvers))))
         sb.append("competition problems:")
-        sb.extend(sorted(list(map(lambda p: '    ' + p.getName(), self.problems))))
+        sb.extend(sorted(list(map(lambda p: '    ' + p.name(), self._problems))))
         return '\n'.join(sb)
 
     @staticmethod
-    def load(configurationModulePath:Path):
+    def configure(configurationModulePath:Path):
         configuration = SourceFileLoader('configuration', str(configurationModulePath)).load_module()
         solvers = list(map(lambda t: Solver(t[0], t[1]), configuration.SOLVERS))
         problemPaths = [f for f in glob.glob(str(configuration.PROBLEM_PATH) + "/**/*.p", recursive=True)]
         problems = list(map(lambda p: TPTPProblem.readFromFile(Path(p)),problemPaths))
         return CASC(configuration.COMPETITION_NAME, solvers, problems, configuration.WC_TIMEOUT, configuration.CPU_TIMEOUT)
 
-    def _addResult(self, result:SolverResult):
+    def addResult(self, result:SolverResult):
         self._results.append(result)
 
     def test(self):
@@ -57,7 +57,7 @@ class CASC(Competition):
 
 
 def main(configurationModulePath:Path):
-    casc = CASC.load(configurationModulePath)
+    casc = CASC.configure(configurationModulePath)
     print(casc)
 
 if __name__ == '__main__':

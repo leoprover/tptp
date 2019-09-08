@@ -1,13 +1,13 @@
 class Solver():
-    def __init__(self, solverName:str, solverCommand:str):
-        self.name = solverName
-        self.command = solverCommand
+    def __init__(self, name:str, command:str):
+        self._name = name
+        self._command = command
 
     def __repr__(self):
-        return ','.join([self.name, self.command])
+        return ','.join([self._name, self._command])
 
-    def getName(self):
-        return self.name
+    def name(self):
+        return self._name
 
-    def getCommand(self):
-        return self.command
+    def command(self):
+        return self._command

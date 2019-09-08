@@ -5,101 +5,124 @@ import requests
 from typing import Callable
 
 class AsyncPostRequest:
-    def __init__(self, url:str, payload:Dict, timeout,
-                 callbackSuccess:Callable=None,
-                 callbackCancelled:Callable=None,
-                 callbackTimeout:Callable=None):
-        self.url = url
-        self.payload = payload
-        self.started = False
-        self.timeout = timeout
-        self.hasBeenCancelled = False
-        self.callbackSuccess = callbackSuccess
-        self.callbackCancelled = callbackCancelled
-        self.callbackTimeout = callbackTimeout
+    # states
+    _PENDING = "PENDING"
+    _RUNNING = "RUNNING"
+    _CANCELLED = "CANCELLED"
+    _FINISHED = "FINISHED"
+
+    def __init__(self, url:str, payload:Dict, timeout):
+        self._state = AsyncPostRequest._PENDING
+        self._url = url
+        self._payload = payload
+        self._timeout = timeout
+        self._callbackSuccess = []
+        self._callbackCancelled = []
+        self._callbackTimeout = []
+
+    def addCallbackSuccess(self, callback:Callable):
+        self._callbackSuccess.append(callback)
+
+    def addCallbackCancelled(self, callback: Callable):
+        self._callbackCancelled.append(callback)
+
+    def addCallbackTimeout(self, callback: Callable):
+        self._callbackTimeout.append(callback)
 
     def start(self):
-        if hasattr(self.timeout, '__call__'):
-            self.calculatedTimeout = self.timeout()
-        elif isinstance(self.timeout, int):
-            self.calculatedTimeout = self.timeout
+        """
+        Starts the asynchronous post request.
+        :return:
+        """
+        if hasattr(self._timeout, '__call__'):
+            self._calculatedTimeout = self._timeout()
+        elif isinstance(self._timeout, int):
+            self._calculatedTimeout = self._timeout
         else:
             raise Exception("Timeout has to be either an integer or a callable object.")
-        self.started = True
+        self._state = AsyncPostRequest._RUNNING
         with ThreadPoolExecutor(max_workers=1) as executor:
-            self.executor = executor
-            self.resultFuture = executor.submit(requests.post,self.url, data=self.payload, timeout=self.calculatedTimeout)
-            self.resultFuture.add_done_callback(self._callbackChooser)
+            self._executor = executor
+            self._resultFuture = executor.submit(requests.post, self._url, data=self._payload, timeout=self._calculatedTimeout)
+            self._resultFuture.add_done_callback(self._callbackChooser)
 
     def _callbackChooser(self, future):
-        '''
+        """
         Selects the appropriate callback when the future is finished
         :return:
-        '''
-        assert(self.finished())
+        """
+        assert(self.done())
         try:
-            self.resultFuture.result()
+            self._resultFuture.result()
         except TimeoutError:
-            if self.callbackTimeout:
-                self.callbackTimeout()
+            for c in self._callbackTimeout:
+                c()
         except CancelledError:
-            if self.callbackCancelled:
-                self.callbackCancelled()
-        if self.callbackSuccess:
-            self.callbackSuccess(self.result())
+            for c in self._callbackCancelled:
+                c()
+        if self._callbackSuccess:
+            for c in self._callbackSuccess:
+                c()
 
-    def finished(self) -> bool:
-        '''
+    def running(self) -> bool:
+        """
+        True iff the method started was invoked.
+        :return:
+        """
+        return self._state == AsyncPostRequest._RUNNING
+
+    def done(self) -> bool:
+        """
         True iff the request has received a response or the request has been cancelled.
         :return:
-        '''
-        if not self.started:
+        """
+        if not self._state == AsyncPostRequest._RUNNING:
             return False
-        if self.resultFuture.done():
+        if self._resultFuture.done():
             return True
         return False
 
     def cancelled(self):
-        '''
-        True iff the request has been cancelled using method cancel.
+        """
+        True iff the request has been cancelled using the method cancel.
         :return:
-        '''
-        return self.hasBeenCancelled
+        """
+        return self._state == AsyncPostRequest._CANCELLED
 
     def cancel(self) -> None:
-        '''
+        """
         Cancels the request i.e. the thread is terminated.
         :return:
-        '''
-        if not self.started:
+        """
+        if not self._state == AsyncPostRequest._RUNNING:
             raise Exception("Request not started.")
-        self.resultFuture.cancel()
-        self.hasBeenCancelled = True
+        self._hasBeenCancelled = True
+        self._resultFuture.cancel()
 
     def wait(self) -> None:
-        '''
+        """
         Waits until the request is finished or cancelled.
         :return:
-        '''
-        self.executor.shutdown(wait=True)
+        """
+        self._executor.shutdown(wait=True)
 
     def result(self) -> requests.Response:
-        '''
+        """
         Returns the response of the request.
         :return:
-        '''
-        if not self.started:
+        """
+        if not self._state == AsyncPostRequest._RUNNING:
             raise Exception("Request not started.")
-        if not self.resultFuture.done():
+        if not self._resultFuture.done():
             raise Exception("Request not finished.")
-        if self.resultFuture.cancelled():
+        if self._resultFuture.cancelled():
             raise Exception("Request was cancelled.")
-        return self.resultFuture.result()
+        return self._resultFuture.result()
 
     def calculatedTimeout(self) -> float:
-        if not self.started:
+        if not self._state == AsyncPostRequest._RUNNING:
             raise Exception("Request not started.")
-        return self.calculatedTimeout
+        return self._calculatedTimeout
 
     def timeout(self):
-        return self.timeout
+        return self._timeout

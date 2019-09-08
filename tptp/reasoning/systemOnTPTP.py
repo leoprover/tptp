@@ -15,26 +15,26 @@ from ..reasoning.core.solver import Solver
 from ..util.concurrent.httpRequest import AsyncPostRequest
 
 class SystemOnTPTPSolver(Solver):
-    def __init__(self, solverName:str, solverCommand:str, inputLanguages:List[TPTPInputLanguage], applications:List[SolverType]):
-        self.name = solverName
-        self.command = solverCommand
-        self.inputLanguages = inputLanguages
-        self.applications = applications
+    def __init__(self, name: str, command: str, inputLanguages: List[TPTPInputLanguage],
+                 applications: List[SolverType]):
+        super().__init__(name, command)
+        self._inputLanguages = inputLanguages
+        self._applications = applications
 
     def __repr__(self):
-        return ','.join([self.name, self.command, ' '.join(map(lambda x: str(x),self.inputLanguages)), ' '.join(map(lambda x: str(x),self.applications))])
+        return ','.join([self._name, self._command, ' '.join(map(lambda x: str(x),self._inputLanguages)), ' '.join(map(lambda x: str(x),self._applications))])
 
-    def getSolverName(self):
-        return self.name
+    def name(self):
+        return self._name
 
-    def getSolverCommand(self):
-        return self.command
+    def command(self):
+        return self._command
 
-    def getInputLanguages(self):
-        return self.inputLanguages
+    def inputLanguages(self):
+        return self._inputLanguages
 
-    def getApplications(self):
-        return self.applications
+    def applications(self):
+        return self._applications
 
 def getSolvers() -> List[SystemOnTPTPSolver]:
     URL_SYSTEM_ON_TPTP = 'http://www.tptp.org/cgi-bin/SystemOnTPTP' # TODO put this into a config
@@ -75,63 +75,63 @@ def getSolvers() -> List[SystemOnTPTPSolver]:
     return ret
 
 class SystemOnTPTPSolverResult(SolverResult):
-    def __init__(self, call, szs: SZSStatus, cpu: float, wc: float, configuration=None):
-        super().__init__(call, szs, cpu, wc, configuration)
+    def __init__(self, call, szs: SZSStatus, cpu: float, wc: float):
+        super().__init__(call, szs, cpu, wc)
 
 class SystemOnTPTPSolverCall(SolverCall):
     def __init__(self, solver:SystemOnTPTPSolver, problem:Problem, timeout):
-        self.solver = solver
-        self.problem = problem
-        self.timeout = timeout
-        self.calculatedTimeout = None
-        self.result = None
-        self.started = False
+        self._solver = solver
+        self._problem = problem
+        self._timeout = timeout
+        self._calculatedTimeout = None
+        self._result = None
+        self._started = False
 
     def __repr__(self):
-        return str(self.solver) + str(self.calculatedTimeout)
+        return str(self._solver) + str(self._calculatedTimeout)
 
     def start(self):
-        self.started = True
+        self._started = True
         URL_SYSTEM_ON_TPTP_FORM = 'http://www.tptp.org/cgi-bin/SystemOnTPTPFormReply'
-        if hasattr(self.timeout, '__call__'):
-            self.calculatedTimeout = self.timeout()
-        elif isinstance(self.timeout, int):
-            self.calculatedTimeout = self.timeout
+        if hasattr(self._timeout, '__call__'):
+            self._calculatedTimeout = self._timeout()
+        elif isinstance(self._timeout, int):
+            self._calculatedTimeout = self._timeout
         payload = {
             'TPTPProblem': '',
             'ProblemSource': 'FORMULAE',
-            'FORMULAEProblem': self.problem.getProblem(),
+            'FORMULAEProblem': self._problem.problem(),
             'QuietFlag': '-q01',  # for output mode System
             # 'QuietFlag':'-q3', #for output mode Result
             'SubmitButton': 'RunSelectedSystems',
-            'System___' + self.solver.getSolverName(): self.solver.getSolverName(),
-            'TimeLimit___' + self.solver.getSolverName(): str(self.calculatedTimeout),
-            'Command___' + self.solver.getSolverName(): self.solver.getSolverCommand(),
+            'System___' + self._solver.name(): self._solver.name(),
+            'TimeLimit___' + self._solver.name(): str(self._calculatedTimeout),
+            'Command___' + self._solver.name(): self._solver.command(),
         }
-        self.request = AsyncPostRequest(URL_SYSTEM_ON_TPTP_FORM, payload, self.calculatedTimeout)
-        self.request.start()
+        self._request = AsyncPostRequest(URL_SYSTEM_ON_TPTP_FORM, payload, self._calculatedTimeout)
+        self._request.start()
 
     def result(self) -> SystemOnTPTPSolverResult:
-        if not self.started:
+        if not self._started:
             raise Exception("Reasoning call has not been started.")
-        if self.request.cancelled():
+        if self._request.cancelled():
             raise Exception("Reasoning call has been cancelled.")
-        if not self.request.finished():
+        if not self._request.done():
             raise Exception("Reasoning call has not been finished.")
         # % RESULT: SOT_WZbJQt - Leo-III---1.4 says Theorem - CPU = 0.00 WC = 0.04
-        self.response = self.request.result()
-        results = re.findall('^% RESULT:.*', self.response.text , re.M)
+        self._response = self._request.result()
+        results = re.findall('^% RESULT:.*', self._response.text , re.M)
         if results == []: # TODO better error reporting
-            raise Exception("Response not interpretable: Could not find RESULT token.\n" + self.response.text)
+            raise Exception("Response not interpretable: Could not find RESULT token.\n" + self._response.text)
         elif len(results) > 1:
-            raise Exception("Response not interpretable: More than one RESULT token.\n" + self.response.text)
+            raise Exception("Response not interpretable: More than one RESULT token.\n" + self._response.text)
         szs = re.search('(?:.*says )(.*)(?: - CPU.*)', results[0], re.I).group(1)
         cpu = float(re.search('(?:.*CPU = )(.*)(?: WC.*)', results[0], re.I).group(1))
         wc = float(re.search('(?:.*WC = )(\S*)(?: .*)', results[0], re.I).group(1))
         return SystemOnTPTPSolverResult(self, SZSStatus.get(szs), cpu, wc)
 
     def wait(self) -> None:
-        self.request.wait()
+        self._request.wait()
 
 def parse_args():
     parser = argparse.ArgumentParser()
