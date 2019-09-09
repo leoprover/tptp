@@ -1,11 +1,32 @@
 from .solverResult import SolverResult
+
 class SolverCall:
     def start(self) -> None:
         """
         Starts the reasoning call.
+        @depricated use run
+        """
+        pass
+
+    def result(self) -> SolverResult:
+        """
+        Returns the result of a started reasoning call.
+        This is a blocking method.
+        @depricated use run
+        """
+        return self.run()
+
+    def run(self) -> SolverResult:
+        """
+        Runs the reasoning call.
+        This is a blocking method.
+        May be called in a different thread.
+
+        Use concurrent.futures.Executor.submit to run this in a different thread
         :return:
         """
         raise NotImplementedError
+
     def isStarted(self) -> bool:
         """
         Indicates whether the reasoning call has already started.
@@ -13,36 +34,47 @@ class SolverCall:
         :return:
         """
         raise NotImplementedError
-    def done(self) -> bool:
+    
+    def isRunning(self) -> bool:
+        """
+        Indicates whether the reasoning call is currently running.
+        :return:
+        """
+        raise NotImplementedError
+
+    def isDone(self) -> bool:
         """
         Checks whether the reasoning call is finished and the reasoning result is available.
         :return:
         """
         raise NotImplementedError
-    def result(self) -> SolverResult:
+    
+    def done(self) -> bool:
         """
-        Returns the result of a started reasoning call.
-        This is a blocking method.
-        If the reasoning call has not been started this method will throw an exception.
-        :return:
+        @depricated use isDone
         """
-        raise NotImplementedError
+        return self.isDone()
+    
     def terminate(self) -> None:
         """
         Cancels the reasoning call asking the recipient (CLI tool, etc.) of the reasoning call to terminate.
-        If the reasoning call has not been started this method will throw an exception.
+        # If the reasoning call has not been started this method will throw an exception.
+        If the reasoning call has not been started the start will be prevented.
         If the reasoning call is already finished this method doesnot have any effect.
         :return:
         """
         raise NotImplementedError
+    
     def kill(self) -> None:
         """
         Cancels the reasoning call without asking the the recipient (CLI tool, etc.) of the reasoning call to terminate.
-        If the reasoning call has not been started this method will throw an exception.
+        # If the reasoning call has not been started this method will throw an exception.
+        If the reasoning call has not been started the start will be prevented.
         If the reasoning call is already finished this method doesnot have any effect.
         :return:
         """
         raise NotImplementedError
+    
     def calculatedTimeout(self) -> float:
         """
         Returns calculated the timeout.
@@ -51,6 +83,7 @@ class SolverCall:
         :return:
         """
         raise NotImplementedError
+    
     def timeout(self):
         """
         Returns the timeout if it is a float or the callable object that calculates the timeout during the start method.
