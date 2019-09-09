@@ -27,7 +27,7 @@ class LocalSolver(Solver):
 
     def call(*, problem_file, timeout):
         c0 = self._command
-        c1 = c0.place('%s', problem_file)
+        c1 = c0.replace('%s', problem_file)
         c2 = c1.replace('%d', timeout)
 
         return c2
