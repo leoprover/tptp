@@ -2,6 +2,7 @@ import re
 from pathlib import Path
 from .szs import SZSStatus
 
+
 class Problem:
     def __init__(self, name:str, source, problem:str):
         self._name = name
@@ -26,8 +27,8 @@ class Problem:
         return cls(str(path.name), path.absolute(), fileContent)
 
 
-class TPTPProblem(Problem):
-    def __init__(self, name:str, source, problem:str, szs:SZSStatus):
+class ProblemWithStatus(Problem):
+    def __init__(self, name: str, source, problem: str, szs:SZSStatus):
         super().__init__(name, source, problem)
         self._szs = szs
 
@@ -36,6 +37,11 @@ class TPTPProblem(Problem):
 
     def szs(self):
         return self._szs
+
+
+class TPTPProblem(ProblemWithStatus):
+    def __init__(self, name:str, source, problem:str, szs:SZSStatus):
+        super().__init__(name, source, problem, szs)
 
     # A TPTP header
     """
