@@ -36,14 +36,53 @@ class LocalProcess(Process):
         self._isTimeout = False
         self._cancled = False
 
-    def running(self):
-        return self._state in [self.STARTED, self.FORCED_TERMINATE_SEND, self.FORCED_KILL_SEND]
-
-    def started(self):
+    def isStarted(self) -> bool:
+        """
+        Whether to process has already been started.
+        """
         return self._state >= self.STARTED
 
-    def done(self):
+    def isRunning(self) -> bool:
+        """
+        Whether the process is currently running.
+        """
+        return self._state in [self.STARTED, self.FORCED_TERMINATE_SEND, self.FORCED_KILL_SEND]
+
+    def isDone(self) -> bool:
+        """
+        Whether the process is done with execution.
+        """
         return self._state >= self.CANCLED
+
+    def isTimeout(self) -> bool:
+        """
+        Whether the process was killed by an external timeout.
+        """
+        return self._state == self.TIMEOUT
+
+    def isInterupted(self) -> bool:
+        """
+        Whether the process has beed tried to be canceled, terminated or killed.
+        """
+        return self._state in [self.FORCED_TERMINATE_SEND, self.FORCED_KILL_SEND, self.CANCLED, self.FORCED_TERMINATED, self.FORCED_KILLED]
+
+    def isCanceled(self) -> bool:
+        """
+        Whether the process has beed canceled.
+        """
+        return self._state == self.CANCLED
+
+    def isTerminated(self) -> bool:
+        """
+        Whether the process has beed terminated.
+        """
+        return self._state == self.FORCED_TERMINATED
+
+    def isKilled(self) -> bool:
+        """
+        Whether the process has been killed.
+        """
+        return self._state == self.FORCED_KILLED
 
     def start(self):
         if callable(self._timeout) or hasattr(self._timeout, '__call__'):
@@ -86,13 +125,13 @@ class LocalProcess(Process):
         )
 
     def calculatedCall(self):
-        if not self.started():
+        if not self.isStarted():
             raise NotYetStartedError()
 
         return self._call_calculated
 
     def calculatedTimeout(self):
-        if not self.started():
+        if not self.isStarted():
             raise NotYetStartedError()
 
         return self._timeout_calculated
@@ -101,7 +140,7 @@ class LocalProcess(Process):
         return self._timeout
 
     def cancle(self):
-        if self.started():
+        if self.isStarted():
             return False
         self._state = self.CANCLED
 
@@ -141,11 +180,11 @@ class LocalProcess(Process):
         os.killpg(os.getpgid(self._process.pid), signal.SIGKILL)  # Send the signal to all the process groups
 
     def communicate(self):
-        if not self.started():
+        if not self.isStarted():
             raise NotYetStartedError()
         
         try:
-            stdout, stderr = self.communicate0()
+            stdout, stderr, returncode = self.communicate0()
         except:
             raise
         finally:
@@ -163,16 +202,16 @@ class LocalProcess(Process):
         stdout_utf8 = stdout.decode('utf8')
         stderr_utf8 = stderr.decode('utf8')
 
-        return stdout_utf8, stderr_utf8
+        return stdout_utf8, stderr_utf8, returncode
 
     def communicate0(self):
         try:
-            stdout, stderr = self.communicate1()
+            stdout, stderr, returncode = self.communicate1()
         except:
             #enforce halt in any case
             self._process.kill()
             raise
-        return stdout, stderr
+        return stdout, stderr, returncode
 
     def communicate1(self):
         if self._timeout:
@@ -185,10 +224,10 @@ class LocalProcess(Process):
                 stdout, stderr = self._process.communicate()
 
                 self._state = self.TIMEOUT
-                return stdout, stderr
+                return stdout, stderr, self._process.returncode
         else:
             stdout, stderr = self._process.communicate()
-        return stdout, stderr
+        return stdout, stderr, self._process.returncode
 
     def run(self):
         self.start()

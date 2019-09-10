@@ -2,6 +2,46 @@ class NotYetStartedError(Exception):
     pass
 
 class Process:
+    def isStarted(self) -> bool:
+        """
+        Whether to process has already been started.
+        """
+
+    def isRunning(self) -> bool:
+        """
+        Whether the process is currently running.
+        """
+
+    def isDone(self) -> bool:
+        """
+        Whether the process is done with execution.
+        """
+
+    def isTimeout(self) -> bool:
+        """
+        Whether the process was killed by an external timeout.
+        """
+
+    def isInterupted(self) -> bool:
+        """
+        Whether the process has beed tried to be canceled, terminated or killed.
+        """
+
+    def isCanceled(self) -> bool:
+        """
+        Whether the process has beed canceled.
+        """
+
+    def isTerminated(self) -> bool:
+        """
+        Whether the process has beed terminated.
+        """
+
+    def isKilled(self) -> bool:
+        """
+        Whether the process has been killed.
+        """
+
     def timeout(self) -> float:
         """
         Calculated timeout of the process.

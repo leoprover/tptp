@@ -87,8 +87,3 @@ class Competition:
 
     def cpuLimit(self) -> int:
         return self.cpuLimit()
-
-
-
-
-

@@ -14,6 +14,7 @@ class CASC(Competition):
     def __init__(self, name: str, solvers: List[Solver], problems: List[TPTPProblem], wcLimit: int, cpuLimit: int):
         super().__init__(name, solvers, problems, wcLimit, cpuLimit)
         self._results = []
+        self._running = False
 
     def __repr__(self):
         sb = []
@@ -41,20 +42,28 @@ class CASC(Competition):
     def test(self):
         raise NotImplementedError
     def start(self):
-        raise NotImplementedError
+        self._running = True
+        wcLimit = self.wcLimit()
+        for p in problems:
+            for s in solvers:
+                result = solver.call(problem, timeout=wcLimit)
+                self._results.append(result)
+        self._running = False
+
     def wait(self):
-        raise NotImplementedError
+        pass
     def cancel(self):
         raise NotImplementedError
     def done(self) -> bool:
         raise NotImplementedError
     def running(self) -> bool:
-        raise NotImplementedError
+        return self._running
+
     def cancelled(self) -> bool:
         raise NotImplementedError
-    def results(self) -> List[SolverResult]:
-        raise NotImplementedError
 
+    def results(self) -> List[SolverResult]:
+        return self._results
 
 def main(configurationModulePath:Path):
     casc = CASC.configure(configurationModulePath)

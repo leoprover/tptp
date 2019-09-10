@@ -36,11 +36,21 @@ class LocalSolver(Solver):
         )
 
 class LocalSolverResult(SolverResult):
-    def __init__(self, call, szs: SZSStatus, cpu: float, wc: float, stdout:str, stderr:str, returnCode:int):
+    def __init__(self, *, 
+        call, 
+        szs: SZSStatus, 
+        cpu: float, 
+        wc: float, 
+        stdout:str, 
+        stderr:str, 
+        returnCode:int,
+        exception:Exception,
+    ):
         super().__init__(call, szs, cpu, wc)
         self._stdout = stdout
         self._stderr = stderr
         self._returnCode = returnCode
+        self._exception = exception
 
     def stdout(self):
         return self._stdout
@@ -50,6 +60,9 @@ class LocalSolverResult(SolverResult):
 
     def returnCode(self):
         return self._returnCode
+
+    def exception(self):
+        return self._exception
 
 class LocalSolverCall(SolverCall):
     def __init__(self, problem:Problem, *, solver:LocalSolver, timeout):
@@ -68,30 +81,45 @@ class LocalSolverCall(SolverCall):
         return c2
 
     def started(self) -> bool:
-        self._process.started()
+        self._process.isStarted()
 
     def running(self) -> bool:
-        self._process.running()
+        self._process.isRunning()
 
     def done(self) -> bool:
-        self._process.done()
+        self._process.isDone()
 
     def run(self):
-        stdout, stderr = self._process.run()
-        call = self._process.calculatedCall()
+        exception = None
+        stdout = None
+        stderr = None
 
-        szs = re.search('% SZS status ([^ ]+)', stdout, re.I).group(1)
-        #cpu = float(re.search('(?:.*CPU = )(.*)(?: WC.*)', stdout, re.I).group(1))
-        #wc = float(re.search('(?:.*WC = )(\S*)(?: .*)', stdout, re.I).group(1))
+        try:
+            stdout, stderr, returncode = self._process.run()
+        except Exception(e):
+            exception = e
+
+        call = self._process.calculatedCall()
+        if stdout:
+            szs = re.search('% SZS status ([^ ]+)', stdout, re.I).group(1)      
+            #cpu = float(re.search('(?:.*CPU = )(.*)(?: WC.*)', stdout, re.I).group(1))
+            #wc = float(re.search('(?:.*WC = )(\S*)(?: .*)', stdout, re.I).group(1))      
+        elif self._process.isTimeout():
+            szs = "Timeout"
+        elif self._process.isInterupted():
+            szs = "User"
+        else:
+            raise NotImplementedError()
 
         return LocalSolverResult(
             call=call,
             szs=szs,
-            cpu=self._process.wc(),
-            wc=None,
+            cpu=None,
+            wc=self._process.wc(),
             stdout=stdout,
             stderr=stderr,
-            returnCode=0,
+            returnCode=returncode,
+            exception=exception,
         )
 
     def cancle(self) -> None:
