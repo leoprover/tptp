@@ -1,7 +1,10 @@
-from tptp.core.szs import SZSStatus
-from tptp.reasoning import SolverResult
+from typing import List
+import re
 
-from tptp.utils.process import Process
+from ..core import Problem, TPTPInputLanguage, SZSStatus
+from .core import Solver, SolverCall, SolverType, SolverResult
+
+from ..utils.concurrent.localProcess import LocalProcess
 
 class LocalSolver(Solver):
     def __init__(self, name: str, command: str, inputLanguages: List[TPTPInputLanguage],
@@ -16,7 +19,7 @@ class LocalSolver(Solver):
     def name(self):
         return self._name
 
-    def command(self):
+    def command(self) -> str:
         return self._command
 
     def inputLanguages(self):
@@ -25,10 +28,10 @@ class LocalSolver(Solver):
     def applications(self):
         return self._applications
 
-    def call(*, problem_file, timeout):
+    def call(self, problem_file, *, timeout) -> str:
         c0 = self._command
-        c1 = c0.replace('%s', problem_file)
-        c2 = c1.replace('%d', timeout)
+        c1 = c0.replace('%s', str(problem_file))
+        c2 = c1.replace('%d', str(int(timeout)))
 
         return c2
 
@@ -49,44 +52,45 @@ class LocalSolverResult(SolverResult):
         return self._returnCode
 
 class LocalSolverCall(SolverCall):
-    def __init__(self, solver:LocalSolver, problem:Problem, timeout):
+    def __init__(self, problem:Problem, *, solver:LocalSolver, timeout):
         self._problem = problem
-        self._process = Process(
+        self._process = LocalProcess(
             timeout=timeout, 
-            call=lambda t: solver.call(problem=problem, timeout=t)
+            call=lambda t: solver.call(problem.source(), timeout=t)
         )
 
-    def isStarted(self) -> bool:
+    def started(self) -> bool:
         """
         Indicates whether the reasoning call has already started.
         A suspended call is considered started.
         :return:
         """
-        self._process.isStarted()
+        self._process.started()
 
-    def isRunning(self) -> bool:
-        self._process.isRunning()
+    def running(self) -> bool:
+        self._process.running()
 
     def done(self) -> bool:
         """
         Checks whether the reasoning call is finished and the reasoning result is available.
         :return:
         """
-        self._process.isDone()       
+        self._process.done()
 
     def run(self):
         stdout, stderr = self._process.run()
         call = self._process.calculatedCall()
+        print(stdout)
 
-        szs = re.search('(?:.*says )(.*)(?: - CPU.*)', stdout, re.I).group(1)
-        cpu = float(re.search('(?:.*CPU = )(.*)(?: WC.*)', stdout, re.I).group(1))
-        wc = float(re.search('(?:.*WC = )(\S*)(?: .*)', stdout, re.I).group(1))
+        szs = re.search('% SZS status ([^ ]+)', stdout, re.I).group(1)
+        #cpu = float(re.search('(?:.*CPU = )(.*)(?: WC.*)', stdout, re.I).group(1))
+        #wc = float(re.search('(?:.*WC = )(\S*)(?: .*)', stdout, re.I).group(1))
 
         return LocalSolverResult(
             call=call,
             szs=szs,
-            cpu=cpu,
-            wc=wc,
+            cpu=self._process.wc(),
+            wc=None,
             stdout=stdout,
             stderr=stderr,
             returnCode=0,
@@ -127,38 +131,3 @@ class LocalSolverCall(SolverCall):
         :return:
         """
         self._process.timeout()
-
-def parse_args():
-    parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers()
-
-    requestparser = subparsers.add_parser('request')
-    requestparser.set_defaults(task='request')
-    requestparser.add_argument('--solver-name', help='name of the solver', required=True)
-    requestparser.add_argument('--solver-command', help='command of the solver', required=True)
-    requestparser.add_argument('--problem', help='path to problem file', required=True)
-    requestparser.add_argument('--timeout', help='timeout in seconds (default is 60)', type=int)
-    requestparser.set_defaults(timeout=60)
-
-    listParser = subparsers.add_parser('list-solvers')
-    listParser.set_defaults(task='list-solvers')
-
-    args = parser.parse_args()
-    return(args)
-
-def main():
-    # example arguments: request --solver-name "Leo-III---1.4" --solver-command "run_Leo-III %s %d" --problem "/home/tg/true.p" --timeout 60
-    args = parse_args()
-    if args.task == 'list-solvers':
-        print(getSolvers())
-    elif args.task == 'request':
-        path = Path(args.problem)
-        problem = Problem.readFromFile(path)
-        solver = LocalSolver(args.solver_name, args.solver_command, [], [])
-        call = LocalSolverCall(solver, problem, args.timeout)
-        result = call.run()
-        print('CALL',call)
-        print('RESULT',result)
-
-if __name__ == '__main__':
-    main()

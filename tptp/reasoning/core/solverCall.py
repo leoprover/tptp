@@ -1,21 +1,6 @@
 from .solverResult import SolverResult
 
 class SolverCall:
-    def start(self) -> None:
-        """
-        Starts the reasoning call.
-        @depricated use run
-        """
-        pass
-
-    def result(self) -> SolverResult:
-        """
-        Returns the result of a started reasoning call.
-        This is a blocking method.
-        @depricated use run
-        """
-        return self.run()
-
     def run(self) -> SolverResult:
         """
         Runs the reasoning call.
@@ -27,7 +12,7 @@ class SolverCall:
         """
         raise NotImplementedError
 
-    def isStarted(self) -> bool:
+    def started(self) -> bool:
         """
         Indicates whether the reasoning call has already started.
         A suspended call is considered started.
@@ -35,25 +20,19 @@ class SolverCall:
         """
         raise NotImplementedError
     
-    def isRunning(self) -> bool:
+    def running(self) -> bool:
         """
         Indicates whether the reasoning call is currently running.
         :return:
         """
         raise NotImplementedError
 
-    def isDone(self) -> bool:
+    def done(self) -> bool:
         """
         Checks whether the reasoning call is finished and the reasoning result is available.
         :return:
         """
         raise NotImplementedError
-    
-    def done(self) -> bool:
-        """
-        @depricated use isDone
-        """
-        return self.isDone()
     
     def terminate(self) -> None:
         """

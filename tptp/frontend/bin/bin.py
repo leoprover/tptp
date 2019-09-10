@@ -2,6 +2,7 @@ import argparse
 from typing import List
 
 from .toolSystemOnTPTP import CliToolSystemOnTPTP
+from .toolLocalSolver import CliToolLocalSolver
 from .toolBase import CliToolBase
 
 
@@ -23,7 +24,7 @@ def parse_args(tools:List[CliToolBase]):
 
 
 def main():
-    activatedTools = [CliToolSystemOnTPTP]
+    activatedTools = [CliToolSystemOnTPTP, CliToolLocalSolver]
     args, actionList = parse_args(activatedTools)
     actionList[args.tool](args)
 

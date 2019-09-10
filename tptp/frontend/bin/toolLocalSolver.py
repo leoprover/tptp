@@ -1,26 +1,26 @@
 from pathlib import Path
 
 from ...core.problem import Problem
-from ...reasoning.systemOnTPTP import getSolvers, SystemOnTPTPSolver, SystemOnTPTPSolverCall
+from ...reasoning.localSolver import LocalSolver, LocalSolverCall
 from .toolBase import CliToolBase
 
 
-class CliToolSystemOnTPTP(CliToolBase):
+class CliToolLocalSolver(CliToolBase):
     def __init__(self, name: str):
         super().__init__(name)
 
     @classmethod
     def getInstance(cls):
-        return cls('system-on-tptp')
+        return cls('local')
 
     def run(self, args):
         if args.task == 'list-solvers':
-            print(getSolvers())
+            print('Non implememented yet')
         elif args.task == 'request':
             path = Path(args.problem)
             problem = Problem.readFromFile(path)
-            solver = SystemOnTPTPSolver(args.solver_name, args.solver_command, [], [])
-            call = SystemOnTPTPSolverCall(problem, solver=solver, timeout=args.timeout)
+            solver = LocalSolver(args.solver_name, args.solver_command, [], [])
+            call = LocalSolverCall(problem, solver=solver, timeout=args.timeout)
             result = call.run()
             print('CALL', call)
             print('RESULT', result)

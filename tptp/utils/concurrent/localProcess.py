@@ -6,25 +6,22 @@ import signal
 logger = logging.getLogger(__name__)
 
 from .timer import Timer
+from .process import Process
 
-class NotYetStartedError(Exception):
-    pass
-
-class Process:
-    INITIALIZED = 0
+class LocalProcess(Process):    
+    INITIALIZED = 1
     
-    STARTED = 1
-    FORCED_TERMINATE_SEND = 2
-    FORCED_KILL_SEND = 3
+    STARTED = 2
+    FORCED_TERMINATE_SEND = 3
+    FORCED_KILL_SEND = 4
 
-    COMPLETED = 4
-    TIMEOUT = 5
-    FORCED_TERMINATED = 6
-    FORCED_KILLED = 7
-
-    def __init__(self, *, timeout=None, call=None, **kwargs):
-        self.kwargs = kwargs
-
+    CANCLED = 5
+    COMPLETED = 6
+    TIMEOUT = 7
+    FORCED_TERMINATED = 8
+    FORCED_KILLED = 9
+    
+    def __init__(self, *, timeout=None, call=None):
         self._timeout = timeout
         self._call = call
 
@@ -33,10 +30,20 @@ class Process:
 
         self.timer = Timer()
         self.timer.schedule()
-        self.state = self.INITIALIZED
+        self._state = self.INITIALIZED
         self._isForcedTerminated = False
         self._isForcedKilled = False
         self._isTimeout = False
+        self._cancled = False
+
+    def running(self):
+        return self._state in [self.STARTED, self.FORCED_TERMINATE_SEND, self.FORCED_KILL_SEND]
+
+    def started(self):
+        return self._state >= self.STARTED
+
+    def done(self):
+        return self._state >= self.CANCLED
 
     def start(self):
         if callable(self._timeout) or hasattr(self._timeout, '__call__'):
@@ -48,19 +55,24 @@ class Process:
             self._call_calculated = self._call(self._timeout_calculated)
         else:
             self._call_calculated = self._call
+        # TODO better splitting
+        if isinstance(self._call_calculated, str):
+            self._call_calculated = self._call_calculated.split(' ')
+
+        if self._state == self.CANCLED:
+            return
 
         self.timer.start()
-
         # if terminated or killed, skip execution
         if self._isForcedTerminated or self._isForcedKilled:
             self.timer.end()
             if self._isForcedTerminated:
-                self.state = self.FORCED_TERMINATED
+                self._state = self.FORCED_TERMINATED
             if self._isForcedKilled:
-                self.state = self.FORCED_KILLED
+                self._state = self.FORCED_KILLED
             return
 
-        self.state = self.STARTED
+        self._state = self.STARTED
 
         # The os.setsid() is passed in the argument preexec_fn so
         # it's run after the fork() and before exec() to run the shell.
@@ -71,17 +83,16 @@ class Process:
             stderr=subprocess.PIPE, # store the stderr in in the subprocess itself
             preexec_fn=os.setsid,
             env=os.environ,  # use the environment of the python instance, s.t. we can set enviroment variables for started subprocesses
-            **self.kwargs,
         )
 
     def calculatedCall(self):
-        if not self.isStarted():
+        if not self.started():
             raise NotYetStartedError()
 
         return self._call_calculated
 
     def calculatedTimeout(self):
-        if not self.isStarted():
+        if not self.started():
             raise NotYetStartedError()
 
         return self._timeout_calculated
@@ -89,16 +100,27 @@ class Process:
     def timeout(self):
         return self._timeout
 
+    def cancle(self):
+        if self.started():
+            return False
+        self._state = self.CANCLED
+
     def terminate(self):
-        self.state = self.FORCED_TERMINATE_SEND
+        self._state = self.FORCED_TERMINATE_SEND
         self._isForcedTerminated = True
         self._terminate()
 
 
     def kill(self):
-        self.state = self.FORCED_KILL_SEND
+        self._state = self.FORCED_KILL_SEND
         self._isForcedKilled = True
         self._kill()
+
+    def wc(self):
+        """
+        Get time running in ms
+        """
+        return int(self.timer.getTimeRunning() * 1000)
 
     def _terminate(self):
         '''
@@ -118,46 +140,34 @@ class Process:
         # @see https://stackoverflow.com/questions/4789837/how-to-terminate-a-python-subprocess-launched-with-shell-true
         os.killpg(os.getpgid(self._process.pid), signal.SIGKILL)  # Send the signal to all the process groups
 
-    def isRunning(self):
-        return self.state in [self.STARTED, self.FORCED_TERMINATE_SEND, self.FORCED_KILL_SEND]
-
-    def isStarted(self):
-        return self.state >= self.STARTED
-
-    def isDone(self):
-        return self.state >= self.COMPLETED
-
     def communicate(self):
-        if not self.isStarted():
+        if not self.started():
             raise NotYetStartedError()
         
         try:
             stdout, stderr = self.communicate0()
+        except:
+            raise
         finally:
             self.timer.end()
             # set state if anything is terminated
             if self._isTimeout:
-                self.state = self.TIMEOUT
+                self._state = self.TIMEOUT
             elif self._isForcedTerminated:
-                self.state = self.FORCED_TERMINATED
+                self._state = self.FORCED_TERMINATED
             elif self._isForcedKilled:
-                self.state = self.FORCED_KILLED
+                self._state = self.FORCED_KILLED
             else:
-                self.state = self.COMPLETED
-        except:
-            raise
+                self._state = self.COMPLETED
 
         stdout_utf8 = stdout.decode('utf8')
         stderr_utf8 = stderr.decode('utf8')
 
-        stdout_utf8_split = stdout_utf8.split('\n')
-        stderr_utf8_split = stderr_utf8.split('\n')
-
-        return stdout_utf8_split, stderr_utf8_split, processStatus
+        return stdout_utf8, stderr_utf8
 
     def communicate0(self):
         try:
-            stdout, stderr = self.communicate1():
+            stdout, stderr = self.communicate1()
         except:
             #enforce halt in any case
             self._process.kill()
@@ -174,7 +184,7 @@ class Process:
                 self._kill()
                 stdout, stderr = self._process.communicate()
 
-                self.state = self.TIMEOUT
+                self._state = self.TIMEOUT
                 return stdout, stderr
         else:
             stdout, stderr = self._process.communicate()
@@ -186,7 +196,7 @@ class Process:
 
     def stateStr(self):
         return '{state} {timer}/{timeout}s'.format(
-            state=self.state,
+            state=self._state,
             timer=self.timer,
             timeout=self._timeout_calculated,
         )

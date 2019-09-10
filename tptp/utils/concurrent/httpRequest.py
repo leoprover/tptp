@@ -4,7 +4,9 @@ from typing import Dict
 import requests
 from typing import Callable
 
-class AsyncPostRequest:
+from .process import Process
+
+class AsyncPostRequest(Process):
     # states
     _PENDING = "PENDING"
     _RUNNING = "RUNNING"
