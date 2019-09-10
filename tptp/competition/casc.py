@@ -46,7 +46,8 @@ class CASC(Competition):
         wcLimit = self.wcLimit()
         for p in problems:
             for s in solvers:
-                result = solver.call(problem, timeout=wcLimit)
+                call = solver.call(problem, timeout=wcLimit)
+                result = call.run()
                 self._results.append(result)
         self._running = False
 
