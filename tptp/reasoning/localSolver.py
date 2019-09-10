@@ -60,27 +60,17 @@ class LocalSolverCall(SolverCall):
         )
 
     def started(self) -> bool:
-        """
-        Indicates whether the reasoning call has already started.
-        A suspended call is considered started.
-        :return:
-        """
         self._process.started()
 
     def running(self) -> bool:
         self._process.running()
 
     def done(self) -> bool:
-        """
-        Checks whether the reasoning call is finished and the reasoning result is available.
-        :return:
-        """
         self._process.done()
 
     def run(self):
         stdout, stderr = self._process.run()
         call = self._process.calculatedCall()
-        print(stdout)
 
         szs = re.search('% SZS status ([^ ]+)', stdout, re.I).group(1)
         #cpu = float(re.search('(?:.*CPU = )(.*)(?: WC.*)', stdout, re.I).group(1))
@@ -96,24 +86,13 @@ class LocalSolverCall(SolverCall):
             returnCode=0,
         )
 
+    def cancle(self) -> None:
+        self._process.cancle()
+
     def terminate(self) -> None:
-        """
-        Cancels the reasoning call asking the recipient (CLI tool, etc.) of the reasoning call to terminate.
-        # If the reasoning call has not been started this method will throw an exception.
-        If the reasoning call has not been started the start will be prevented.
-        If the reasoning call is already finished this method doesnot have any effect.
-        :return:
-        """
         self._process.terminate()
 
     def kill(self) -> None:
-        """
-        Cancels the reasoning call without asking the the recipient (CLI tool, etc.) of the reasoning call to terminate.
-        # If the reasoning call has not been started this method will throw an exception.
-        If the reasoning call has not been started the start will be prevented.
-        If the reasoning call is already finished this method doesnot have any effect.
-        :return:
-        """
         self._process.kill()
 
     def calculatedTimeout(self) -> float:

@@ -21,7 +21,7 @@ class LocalProcess(Process):
     FORCED_TERMINATED = 8
     FORCED_KILLED = 9
     
-    def __init__(self, *, timeout=None, call=None):
+    def __init__(self, call=None, *, timeout=None):
         self._timeout = timeout
         self._call = call
 

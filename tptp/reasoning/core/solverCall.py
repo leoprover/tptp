@@ -33,11 +33,17 @@ class SolverCall:
         :return:
         """
         raise NotImplementedError
+
+    def cancle(self) -> None:
+        """
+        If the reasoning call has not been started the start will be prevented.
+        If the reasoning call is already finished this method doesnot have any effect.
+        :return:
+        """
     
     def terminate(self) -> None:
         """
-        Cancels the reasoning call asking the recipient (CLI tool, etc.) of the reasoning call to terminate.
-        # If the reasoning call has not been started this method will throw an exception.
+        Terminates the reasoning call asking the recipient (CLI tool, etc.) of the reasoning call to terminate.
         If the reasoning call has not been started the start will be prevented.
         If the reasoning call is already finished this method doesnot have any effect.
         :return:
@@ -46,8 +52,7 @@ class SolverCall:
     
     def kill(self) -> None:
         """
-        Cancels the reasoning call without asking the the recipient (CLI tool, etc.) of the reasoning call to terminate.
-        # If the reasoning call has not been started this method will throw an exception.
+        Cancels the reasoning call without asking the the recipient (CLI tool, etc.) of the reasoning call to kill.
         If the reasoning call has not been started the start will be prevented.
         If the reasoning call is already finished this method doesnot have any effect.
         :return:
