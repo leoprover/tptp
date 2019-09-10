@@ -1,6 +1,9 @@
 import os
 from pathlib import Path
 
+# type of the competition
+COMPETITION_TYPE = "CASC"
+
 # name of the competition
 COMPETITION_NAME = "Chris' private CASC 2019"
 

@@ -2,6 +2,7 @@ import argparse
 from typing import List
 
 from .toolSystemOnTPTP import CliToolSystemOnTPTP
+from .toolCompetition import CliToolCompetition
 from .toolBase import CliToolBase
 
 
@@ -14,8 +15,7 @@ def parse_args(tools:List[CliToolBase]):
         instance = t.getInstance()
         toolParser = topLevelSubParsers.add_parser(instance.name())
         toolParser.set_defaults(tool=instance.name())
-        toolSubParser = toolParser.add_subparsers()
-        instance.parseArgs(toolSubParser)
+        instance.parseArgs(toolParser)
         actionList[instance.name()] = instance.run
 
     args = topLevelParser.parse_args()
@@ -23,7 +23,7 @@ def parse_args(tools:List[CliToolBase]):
 
 
 def main():
-    activatedTools = [CliToolSystemOnTPTP]
+    activatedTools = [CliToolSystemOnTPTP, CliToolCompetition]
     args, actionList = parse_args(activatedTools)
     actionList[args.tool](args)
 

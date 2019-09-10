@@ -27,8 +27,9 @@ class CliToolSystemOnTPTP(CliToolBase):
             print('CALL', call)
             print('RESULT', result)
 
-    def parseArgs(self, toolSubParser):
-        requestparser = toolSubParser.add_parser('request')
+    def parseArgs(self, toolParser):
+        toolSubParsers = toolParser.add_subparsers()
+        requestparser = toolSubParsers.add_parser('request')
         requestparser.set_defaults(task='request')
         requestparser.add_argument('--solver-name', help='name of the solver', required=True)
         requestparser.add_argument('--solver-command', help='command of the solver', required=True)
@@ -36,5 +37,5 @@ class CliToolSystemOnTPTP(CliToolBase):
         requestparser.add_argument('--timeout', help='timeout in seconds (default is 60)', type=int)
         requestparser.set_defaults(timeout=60)
 
-        listParser = toolSubParser.add_parser('list-solvers')
+        listParser = toolSubParsers.add_parser('list-solvers')
         listParser.set_defaults(task='list-solvers')
