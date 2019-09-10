@@ -28,12 +28,12 @@ class LocalSolver(Solver):
     def applications(self):
         return self._applications
 
-    def call(self, problem_file, *, timeout) -> str:
-        c0 = self._command
-        c1 = c0.replace('%s', str(problem_file))
-        c2 = c1.replace('%d', str(int(timeout)))
-
-        return c2
+    def call(self, problem:Problem, *, timeout):
+        return LocalSolverCall(
+            problem=problem,
+            solver=self,
+            timeout=timeout,
+        )
 
 class LocalSolverResult(SolverResult):
     def __init__(self, call, szs: SZSStatus, cpu: float, wc: float, stdout:str, stderr:str, returnCode:int):
@@ -54,10 +54,18 @@ class LocalSolverResult(SolverResult):
 class LocalSolverCall(SolverCall):
     def __init__(self, problem:Problem, *, solver:LocalSolver, timeout):
         self._problem = problem
+        self._solver = solver
         self._process = LocalProcess(
             timeout=timeout, 
-            call=lambda t: solver.call(problem.source(), timeout=t)
+            call=lambda t: self._generateCall(problem, timeout=t)
         )
+
+    def _generateCall(self, problem, *, timeout) -> str:
+        c0 = self._solver.command()
+        c1 = c0.replace('%s', str(problem.source()))
+        c2 = c1.replace('%d', str(int(timeout)))
+
+        return c2
 
     def started(self) -> bool:
         self._process.started()

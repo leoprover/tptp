@@ -32,6 +32,13 @@ class SystemOnTPTPSolver(Solver):
     def applications(self):
         return self._applications
 
+    def call(self, problem:Problem, *, timeout):
+        return SystemOnTPTPSolverCall(
+            problem=problem, 
+            solver=self, 
+            timeout=timeout
+        )
+
 def getSolvers() -> List[SystemOnTPTPSolver]:
     URL_SYSTEM_ON_TPTP = 'http://www.tptp.org/cgi-bin/SystemOnTPTP' # TODO put this into a config
     site = requests.get(URL_SYSTEM_ON_TPTP)
