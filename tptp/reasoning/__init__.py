@@ -1,5 +1,6 @@
+from .core.solver import Solver
 from .core.solverCall import SolverCall
 from .core.solverResult import SolverResult
 
 from .scheduler.reasoningScheduler import ReasoningScheduler
-from . import solvers
+from .loader import loadSolvers, getLocalSolvers, getSystemOnTptpSolvers, getLocalSolver, getSystemOnTptpSolver

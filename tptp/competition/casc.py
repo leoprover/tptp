@@ -8,10 +8,8 @@ from pathlib import Path
 from ..core import SZSStatus
 from ..reasoning.localSolver import LocalSolver
 from .competition import Competition
-from ..reasoning import SolverResult
-from ..reasoning.solvers import loadSolvers
-from ..reasoning.core.solver import Solver
-from ..core.problem import TPTPProblem, ProblemWithStatus
+from ..reasoning import Solver, SolverResult, loadSolvers
+from ..core import TPTPProblem, ProblemWithStatus
 
 class CASC(Competition):
     def __init__(self, name: str, solvers: List[Solver], problems: List[TPTPProblem], wcLimit: int, cpuLimit: int):

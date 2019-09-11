@@ -3,7 +3,7 @@ from pathlib import Path
 from ...core.problem import Problem
 from ...reasoning.localSolver import LocalSolver, LocalSolverCall
 from .toolBase import CliToolBase
-from ...reasoning import solvers
+from ...reasoning import loadSolvers
 
 class CliToolLocalSolver(CliToolBase):
     def __init__(self, name: str):
