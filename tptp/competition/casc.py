@@ -2,19 +2,23 @@ import glob
 import sys
 from importlib.machinery import SourceFileLoader
 
-from typing import List
+from typing import List, Callable, Iterable
 from pathlib import Path
 
+from ..core import SZSStatus
+from ..reasoning.localSolver import LocalSolver
 from .competition import Competition
 from ..reasoning import SolverResult
 from ..reasoning.core.solver import Solver
-from ..core.problem import TPTPProblem
+from ..core.problem import TPTPProblem, ProblemWithStatus
+
 
 class CASC(Competition):
     def __init__(self, name: str, solvers: List[Solver], problems: List[TPTPProblem], wcLimit: int, cpuLimit: int):
         super().__init__(name, solvers, problems, wcLimit, cpuLimit)
         self._results = []
         self._running = False
+        self._resultCallbacks = []
 
     def __repr__(self):
         sb = []
@@ -28,46 +32,49 @@ class CASC(Competition):
         sb.extend(sorted(list(map(lambda p: '    ' + p.name(), self._problems))))
         return '\n'.join(sb)
 
-    @staticmethod
-    def configure(configurationModulePath:Path):
-        configuration = SourceFileLoader('configuration', str(configurationModulePath)).load_module()
-        solvers = list(map(lambda t: Solver(t[0], t[1]), configuration.SOLVERS))
-        problemPaths = [f for f in glob.glob(str(configuration.PROBLEM_PATH) + "/**/*.p", recursive=True)]
-        problems = list(map(lambda p: TPTPProblem.readFromFile(Path(p)),problemPaths))
-        return CASC(configuration.COMPETITION_NAME, solvers, problems, configuration.WC_TIMEOUT, configuration.CPU_TIMEOUT)
-
     def addResult(self, result:SolverResult):
         self._results.append(result)
+        for c in self._resultCallbacks:
+            c(self._results)
 
-    def test(self):
-        raise NotImplementedError
-    def start(self):
+    def addResultCallback(self, callback:Callable[[List[SolverResult]], object]):
+        self._resultCallbacks.append(callback)
+
+    @staticmethod
+    def resultString(results:List[SolverResult]):
+        if len(results) == 0:
+            print("No results so far.")
+        lastResult = results[len(results)-1]
+        szsResultMatches = lastResult._szs.matches(lastResult._call._problem.szs())
+        print(lastResult._call._solver._name, "says", lastResult._szs, "which is", szsResultMatches)
+
+    def run(self):
         self._running = True
         wcLimit = self.wcLimit()
-        for p in problems:
-            for s in solvers:
-                call = solver.call(problem, timeout=wcLimit)
+        self.addResultCallback(CASC.resultString)
+        for p in self._problems:
+            for s in self._solvers:
+                call = s.call(p, timeout=wcLimit)
                 result = call.run()
-                self._results.append(result)
+                self.addResult(result)
         self._running = False
-
-    def wait(self):
-        pass
-    def cancel(self):
-        raise NotImplementedError
-    def done(self) -> bool:
-        raise NotImplementedError
-    def running(self) -> bool:
-        return self._running
-
-    def cancelled(self) -> bool:
-        raise NotImplementedError
+        print(self._results)
 
     def results(self) -> List[SolverResult]:
         return self._results
 
+    @staticmethod
+    def configure(configurationModulePath:Path):
+        configuration = SourceFileLoader('configuration', str(configurationModulePath)).load_module()
+        solvers = list(map(lambda t: LocalSolver(t[0], t[1], [], []), configuration.SOLVERS))
+        #problemPaths = [f for f in glob.glob(str(configuration.PROBLEM_PATH) + "/**/*.p", recursive=True)]
+        #problems = list(map(lambda p: TPTPProblem.readFromFile(Path(p)),problemPaths))
+        problems = list(map(lambda p: ProblemWithStatus(Path(p[0]).name, Path(p[0]).absolute(), None, SZSStatus.get(p[1])), configuration.PROBLEMS))
+        return CASC(configuration.COMPETITION_NAME, solvers, problems, configuration.WC_TIMEOUT, configuration.CPU_TIMEOUT)
+
+
 def main(configurationModulePath:Path):
-    casc = CASC.configure(configurationModulePath)
+    casc = configure(configurationModulePath)
     print(casc)
 
 if __name__ == '__main__':

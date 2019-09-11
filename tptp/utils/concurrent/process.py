@@ -76,7 +76,7 @@ class Process:
         """
         raise NotImplementedError()
 
-    def cancle(self):
+    def cancel(self):
         """
         Cancle the process.
         Does nothing if the process is already started or terminated.

@@ -46,7 +46,7 @@ class SolverCall:
         """
         raise NotImplementedError()
 
-    def cancle(self) -> None:
+    def cancel(self) -> None:
         """
         If the reasoning call has not been started the start will be prevented.
         If the reasoning call is already finished this method doesnot have any effect.
