@@ -26,10 +26,17 @@ class CliToolCompetition(CliToolBase):
         if not configuration.COMPETITION_TYPE in CliToolCompetition.AVAILABLE_COMPETITIONS:
             print("Competition type " + configuration.COMPETITION_TYPE + " is not supported. Please choose from " + str(sorted(CliToolCompetition.AVAILABLE_COMPETITIONS.keys())) + ".")
             sys.exit(1)
+        
         competitionClass = CliToolCompetition.AVAILABLE_COMPETITIONS.get(configuration.COMPETITION_TYPE)
-        print(competitionClass)
-        competitionInstance = competitionClass.configure(configurationModulePath)
+        #print(competitionClass)
+        competitionInstance = competitionClass.configure(configurationModulePath, 
+            verbose=args.verbose
+        )
         competitionInstance.run()
 
     def parseArgs(self, toolSubParser):
         toolSubParser.add_argument('configuration', help='configuration file of the competition')
+        toolSubParser.add_argument('--verbose',
+            help='generates a more verbose output',
+            action='store_const', default=False, const=True,
+        )

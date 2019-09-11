@@ -13,8 +13,8 @@ COMPETITION_NAME = "Test DIMACS CNF Competition"
 SOLVERS = (
     {
         'type': 'local',
-        'name': 'cvc4',
-        'command': 'cvc4 --output-lang tptp --produce-models --tlimit=%md %s',
+        'name': 'picosat',
+        'command': './solvers/picosat-tptp.sh -L %d %s',
     },
     {
         'type': 'local',
@@ -23,11 +23,21 @@ SOLVERS = (
         'pretty-name': 'Nitpick',
         'command': 'nitpick %d %s',
     },
+    {
+        'type': 'local',
+        'name': 'satisfiable-dummy',
+        'command': './solvers/satisfiable-dummy.sh %s -t %d',
+    },
+    {
+        'type': 'local',
+        'name': 'unsatisfiable-dummy',
+        'command': './solvers/unsatisfiable-dummy.sh %s -t %d',
+    },
 )
 
 # a directory containing problems as Path object
 # subdirectory structures are supported
-basePath = Path(os.path.dirname(os.path.abspath(__file__))) / 'testProblems'
+basePath = Path(os.path.dirname(os.path.abspath(__file__))) / 'problems'
 PROBLEMS = (
     (basePath / 'Sat1.cnf', 'Satisfiable'),
     (basePath / 'Sat2.cnf', 'Satisfiable'),
@@ -37,14 +47,14 @@ PROBLEMS = (
     (basePath / 'Sat6.cnf', 'Satisfiable'),
     (basePath / 'Sat7.cnf', 'Satisfiable'),
     (basePath / 'Sat8.cnf', 'Satisfiable'),
-    (basePath / 'Unsat1.cnf', 'CounterSatisfiable'),
-    (basePath / 'Unsat2.cnf', 'CounterSatisfiable'),
-    (basePath / 'Unsat3.cnf', 'CounterSatisfiable'),
-    (basePath / 'Unsat4.cnf', 'CounterSatisfiable'),
-    (basePath / 'Unsat5.cnf', 'CounterSatisfiable'),
-    (basePath / 'Unsat6.cnf', 'CounterSatisfiable'),
-    (basePath / 'Unsat7.cnf', 'CounterSatisfiable'),
-    (basePath / 'Unsat8.cnf', 'CounterSatisfiable'),
+    (basePath / 'Unsat1.cnf', 'Unsatisfiable'),
+    (basePath / 'Unsat2.cnf', 'Unsatisfiable'),
+    (basePath / 'Unsat3.cnf', 'Unsatisfiable'),
+    (basePath / 'Unsat4.cnf', 'Unsatisfiable'),
+    (basePath / 'Unsat5.cnf', 'Unsatisfiable'),
+    (basePath / 'Unsat6.cnf', 'Unsatisfiable'),
+    (basePath / 'Unsat7.cnf', 'Unsatisfiable'),
+    (basePath / 'Unsat8.cnf', 'Unsatisfiable'),
 )
 
 # maximum wall clock time

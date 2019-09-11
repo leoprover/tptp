@@ -161,7 +161,7 @@ class LocalSolverCall(SolverCall):
             stderr=stderr,
             returnCode=returncode,
             exception=exception,
-            command=self._process.calculatedCall(),
+            command=self._process.estimatedCall(),
         )
 
     def cancel(self) -> None:

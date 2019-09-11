@@ -1,4 +1,4 @@
-
+#!/bin/sh
 # run some basic exec-tests
 
 # check if all listing are ok

@@ -17,6 +17,18 @@ class SolverResult:
             szsStatus=self._szs,
         )
 
+    def szsStatus(self):
+        return self._szs
+
+    def call(self):
+        return self._call
+
+    def cpu(self):
+        return self._cpu
+
+    def wc(self):
+        return self._wc
+
     def output(self):
         """
         The raw tptp-conform output of the solver

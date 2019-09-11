@@ -19,7 +19,9 @@ class Competition:
         return "Competition: " + self._name
     
     @staticmethod
-    def configure(configurationModulePath:Path):
+    def configure(configurationModulePath:Path, *,
+        verbose=False,
+    ):
         """
         
         :param configurationModulePath: 

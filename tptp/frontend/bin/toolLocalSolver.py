@@ -35,8 +35,11 @@ class CliToolLocalSolver(CliToolBase):
             )
             call = solver.call(problem, timeout=args.timeout)
             result = call.run()
-            print('CALL', call)
-            print('RESULT', result)
+            print('Calling', call)
+            print(result)
+            print(result.output())
+            if result.exception():
+                print(result.exception())
 
     def parseArgs(self, toolParser):
         toolSubParsers = toolParser.add_subparsers()

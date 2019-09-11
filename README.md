@@ -3,9 +3,14 @@
 # Installation
 
 # Usage
-## Run example competition:
+## Run an example competition:
 ```
-python3 -m tptp competition --configuration competition-test/definition.py
+python3 -m tptp competition competition-test/definition.py
+```
+
+Run with more output. Good for error tracking.
+```
+python3 -m tptp competition competition-test/definition.py --verbose
 ```
 
 ## Run System-on-TPTP:

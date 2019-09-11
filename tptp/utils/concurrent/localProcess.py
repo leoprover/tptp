@@ -135,9 +135,18 @@ class LocalProcess(Process):
             shell=True,
         )
 
-    def calculatedCall(self):
+    def call(self):
         if not self.isStarted():
             raise NotYetStartedError()
+
+        return self._call_calculated
+
+    def estimatedCall(self):
+        if not self.isStarted():
+            if callable(self._call) or hasattr(self._call, '__call__'):
+                self._call_calculated = self._call(self.estimatedTimeout())
+            else:
+                self._call_calculated = self._call
 
         return self._call_calculated
 
