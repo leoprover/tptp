@@ -121,7 +121,7 @@ class ThreadedTaskExecuter:
             self._refillActiveTasks()
 
     def cancle(self, task):
-        task.future.cancle()
+        task.future.cancel()
 
     def _onFinish(self, future):
         task = future.task

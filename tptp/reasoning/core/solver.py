@@ -1,3 +1,6 @@
+from ...core import Problem
+
+
 class Solver():
     def __init__(self, name:str, *,
         command:str,
@@ -23,3 +26,6 @@ class Solver():
 
     def prettyName(self):
         return self._prettyName
+
+    def call(self, problem:Problem, *, timeout):
+        raise NotImplementedError()

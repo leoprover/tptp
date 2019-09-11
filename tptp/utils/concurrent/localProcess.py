@@ -162,7 +162,7 @@ class LocalProcess(Process):
             return self._timeout
         return self._timeout_calculated
 
-    def cancle(self):
+    def cancel(self):
         if self.isStarted():
             return False
         self._state = self.CANCELLED

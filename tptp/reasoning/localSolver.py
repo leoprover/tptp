@@ -98,6 +98,7 @@ class LocalSolverCall(SolverCall):
 
         return c2
 
+
     def isStarted(self) -> bool:
         return self._process.isStarted()
 
@@ -122,28 +123,28 @@ class LocalSolverCall(SolverCall):
             stdout, stderr, returncode = self._process.run()
         except Exception as e:
             exception = e
+            returncode = None
 
-        call = self._process.calculatedCall()
         if stdout:
-            g = re.search('% SZS status ([^ ]+)', stdout, re.I)
+            g = re.search('% SZS status ([^\s]+)', stdout, re.I)
             if not g:
-                szs = "Error"
+                szs = SZSStatus.get("Error")
             else:
-                szs = g.group(1)
+                szs = SZSStatus.get(g.group(1))
 
             #cpu = float(re.search('(?:.*CPU = )(.*)(?: WC.*)', stdout, re.I).group(1))
             #wc = float(re.search('(?:.*WC = )(\S*)(?: .*)', stdout, re.I).group(1))      
         elif self._process.isTimeout():
-            szs = "Timeout"
+            szs = SZSStatus.get("Timeout")
         elif self._process.isInterupted():
-            szs = "User"
+            szs = SZSStatus.get("User")
         else:
-            szs = "Error"
+            szs = SZSStatus.get("Error")
 
         return LocalSolverResult(
-            call=call,
+            call=self,
             szs=szs,
-            cpu=None,
+            cpu=None, # TODO
             wc=self._process.timeRunning(),
             stdout=stdout,
             stderr=stderr,
@@ -151,8 +152,8 @@ class LocalSolverCall(SolverCall):
             exception=exception,
         )
 
-    def cancle(self) -> None:
-        self._process.cancle()
+    def cancel(self) -> None:
+        self._process.cancel()
 
     def terminate(self) -> None:
         self._process.terminate()

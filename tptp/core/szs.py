@@ -107,6 +107,9 @@ class SZSStatus():
     def __str__(self):
         return self._longName
 
+    def matches(self, other):
+        return self.__eq__(other)
+    
     @staticmethod
     def get(status:str):
         """
@@ -114,9 +117,9 @@ class SZSStatus():
         :param status:
         :return:
         """
-        if status in SZSStatus._shortNames.keys():
+        if status in SZSStatus._shortNames:
             return SZSStatus._shortNames[status]
-        if status in SZSStatus._longNames.keys():
+        if status in SZSStatus._longNames:
             return SZSStatus._longNames[status]
         raise UnknownSZSStatusError('\"' + status + '\" is not a valid SZS status.')
 

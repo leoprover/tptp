@@ -25,7 +25,7 @@ class Solvers():
 
     def loadDefaultSolvers(self):
         solvers = SourceFileLoader('solvers', DEFAULT_SOLVER_PATH).load_module()
-        self._localSolver, self._systemOnTptpSolver = parse(solvers.SOLVERS, split=True)
+        self._localSolver, self._systemOnTptpSolver = loadSolversAsDict(solvers.SOLVERS)
         
     def getLocalSolver(self, name):
         return self._localSolver.get(name, None)
@@ -41,7 +41,7 @@ def _solvers():
     _solvers__singelton.init()
     return _solvers__singelton
 
-def parse(solverDefinitions, split=False):
+def loadSolversAsDict(solverDefinitions):
     _localSolver = {}
     _systemOnTptpSolver = {}
 
@@ -63,11 +63,33 @@ def parse(solverDefinitions, split=False):
                 version = s.get('version', None),
                 command = s['command'],
             )
-            raise NotImplementedError()
 
     if split:
         return _localSolver, _systemOnTptpSolver
-    return _localSolver + _systemOnTptpSolver
+
+def loadSolvers(solverDefinitions, split=False):
+    _solvers = []
+
+    for s in solverDefinitions:
+        if s['type'] == 'local':
+            name = s['name']
+            _solvers.append(LocalSolver(
+                name = name, 
+                prettyName = s.get('pretty-name', None),
+                version = s.get('version', None),
+                command = s['command'],
+            ))
+        else:
+            name = s['name']
+            _solvers.append(SystemOnTPTPSolver(
+                name = name, 
+                prettyName = s.get('pretty-name', None),
+                systemOnTPTPName = s['system-on-tptp-name'],
+                version = s.get('version', None),
+                command = s['command'],
+            ))
+
+    return _solvers
 
 def getLocalSolvers():
     return _solvers()._localSolver

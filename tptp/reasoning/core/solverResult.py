@@ -10,3 +10,4 @@ class SolverResult:
 
     def __repr__(self):
         return ','.join(map(lambda x: str(x), [self._szs,self._cpu,self._wc,self._call]))
+
