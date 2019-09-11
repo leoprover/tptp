@@ -179,12 +179,6 @@ class LocalProcess(Process):
         self._isForcedKilled = True
         self._kill()
 
-    def wc(self):
-        """
-        Get time running in ms
-        """
-        return int(self.timer.getTimeRunning() * 1000)
-
     def _terminate(self):
         '''
         Terminates the underlaying execution.
