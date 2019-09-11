@@ -77,6 +77,7 @@ def loadSolvers(solverDefinitions, split=False):
                 prettyName = s.get('pretty-name', None),
                 version = s.get('version', None),
                 command = s['command'],
+                encoding = s.get('encoding', None),
             ))
         else:
             name = s['name']

@@ -27,8 +27,8 @@ class CliToolCompetition(CliToolBase):
             print("Competition type " + configuration.COMPETITION_TYPE + " is not supported. Please choose from " + str(sorted(CliToolCompetition.AVAILABLE_COMPETITIONS.keys())) + ".")
             sys.exit(1)
         competitionClass = CliToolCompetition.AVAILABLE_COMPETITIONS.get(configuration.COMPETITION_TYPE)
-        print(competitionClass)
         competitionInstance = competitionClass.configure(configurationModulePath)
+        print(competitionInstance)
         competitionInstance.run()
 
     def parseArgs(self, toolSubParser):

@@ -5,6 +5,7 @@ from pathlib import Path
 import requests
 import re
 
+from tptp.encoding.encodingChooser import getEncoder
 from ..core import Problem, TPTPInputLanguage, SZSStatus
 from .core import Solver, SolverCall, SolverType, SolverResult
 
@@ -16,6 +17,7 @@ class SystemOnTPTPSolver(Solver):
         command: str, 
         version: str= None,
         prettyName: str= None,
+        encoding: str=None,
         inputLanguages: List[TPTPInputLanguage]= [],
         applications: List[SolverType]= [],
     ):
@@ -25,6 +27,7 @@ class SystemOnTPTPSolver(Solver):
             command=command, 
             version=version,
         )
+        self._encoding=encoding
         self._systemOnTPTPName = systemOnTPTPName
         self._inputLanguages = inputLanguages
         self._applications = applications
@@ -129,6 +132,10 @@ class SystemOnTPTPSolverCall(SolverCall):
 
     def start(self):
         self._started = True
+        if self._solver._encoding:
+            problem = getEncoder(self._problem, self._solver._encoding).encode(self._problem).newProblem
+        else:
+            problem = self._problem.problem()
         URL_SYSTEM_ON_TPTP_FORM = 'http://www.tptp.org/cgi-bin/SystemOnTPTPFormReply'
         if hasattr(self._timeout, '__call__'):
             self._calculatedTimeout = self._timeout()
@@ -137,7 +144,7 @@ class SystemOnTPTPSolverCall(SolverCall):
         payload = {
             'TPTPProblem': '',
             'ProblemSource': 'FORMULAE',
-            'FORMULAEProblem': self._problem.problem(),
+            'FORMULAEProblem': problem,
             'QuietFlag': '-q01',  # for output mode System
             # 'QuietFlag':'-q3', #for output mode Result
             'SubmitButton': 'RunSelectedSystems',
