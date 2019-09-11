@@ -68,6 +68,7 @@ class LocalSolverCall(SolverCall):
     def __init__(self, problem:Problem, *, solver:LocalSolver, timeout):
         self._problem = problem
         self._solver = solver
+        self._timeout = timeout
         self._process = LocalProcess(
             timeout=timeout, 
             call=lambda t: self._generateCall(problem, timeout=t)
@@ -115,7 +116,7 @@ class LocalSolverCall(SolverCall):
             call=call,
             szs=szs,
             cpu=None,
-            wc=self._process.wc(),
+            wc=self._process.timeRunning(),
             stdout=stdout,
             stderr=stderr,
             returnCode=returncode,
@@ -131,18 +132,19 @@ class LocalSolverCall(SolverCall):
     def kill(self) -> None:
         self._process.kill()
 
-    def calculatedTimeout(self) -> float:
+    def timeout(self) -> float:
         """
         Returns calculated the timeout.
         If the reasoning call has not been started this method will throw an exception.
         Since a timeout can be a float or a callable object the timeout is evaluated when the method start is invoked.
         :return:
         """
-        self._process.calculatedTimeout()
+        self._process.timeout()
 
-    def timeout(self):
+    def estimatedTimeout(self):
         """
-        Returns the timeout if it is a float or the callable object that calculates the timeout during the start method.
+        Estimated timeout of the call. If the timeouts has allready been calculatd the result is equal to ```timeout()```.
+        Otherwise timeout is precalulated and may be differ from the finally used timeout.
         :return:
         """
-        self._process.timeout()
+        self._process.estimatedTimeout()

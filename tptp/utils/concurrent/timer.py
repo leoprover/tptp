@@ -48,6 +48,13 @@ class Timer:
             return None
         return self.endTime - zero
 
+    def getTimeScheduled(self):
+        if self.scheduledTime is None:
+            return 0
+        if self.startTime is None:
+            return time.time() - self.scheduledTime
+        return self.startTime - self.scheduledTime
+
     def getTimeRunning(self):
         if self.endTime:
             if self.startTime is None:

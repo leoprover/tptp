@@ -59,18 +59,17 @@ class SolverCall:
         """
         raise NotImplementedError
     
-    def calculatedTimeout(self) -> float:
+    def timeout(self) -> float:
         """
-        Returns calculated the timeout.
-        If the reasoning call has not been started this method will throw an exception.
-        Since a timeout can be a float or a callable object the timeout is evaluated when the method start is invoked.
+        Estimated timeout of the call. If the timeouts has allready been calculatd the result is equal to ```timeout()```.
+        Otherwise timeout is precalulated and may be differ from the finally used timeout.
         :return:
         """
         raise NotImplementedError
     
-    def timeout(self):
+    def estimatedTimeout(self) -> float:
         """
-        Returns the timeout if it is a float or the callable object that calculates the timeout during the start method.
+        Returns calculated the timeout if one is available, otherwise it precalculates the timeout a gives an estimation.
         :return:
         """
         raise NotImplementedError

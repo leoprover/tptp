@@ -84,6 +84,18 @@ class LocalProcess(Process):
         """
         return self._state == self.FORCED_KILLED
 
+    def timeScheduled(self) -> float:
+        """
+        Time the process is scheduled and not started (calling run) in seconds.
+        """
+        return self.timer.getTimeScheduled()
+
+    def timeRunning(self) -> float:
+        """
+        Time the process is running (call of run) in seconds.
+        """
+        return self.timer.getTimeRunning()
+
     def start(self):
         if callable(self._timeout) or hasattr(self._timeout, '__call__'):
             self._timeout_calculated = self._timeout()
@@ -130,14 +142,26 @@ class LocalProcess(Process):
 
         return self._call_calculated
 
-    def calculatedTimeout(self):
+    def timeout(self):
+        """
+        Calculated timeout of the process.
+        :raise: NotYetStartedError: if the process is not yet started.
+        """
         if not self.isStarted():
             raise NotYetStartedError()
 
         return self._timeout_calculated
 
-    def timeout(self):
-        return self._timeout
+    def estimatedTimeout(self) -> float:
+        """
+        Estimated timeout of the process. If the timeouts has allready been calculatd the result is equal to ```timeout()```.
+        Otherwise timeout is precalulated and may be differ from the finally used timeout.
+        """
+        if not self.isStarted():
+            if callable(self._timeout) or hasattr(self._timeout, '__call__'):
+                return self._timeout()
+            return self._timeout
+        return self._timeout_calculated
 
     def cancle(self):
         if self.isStarted():
@@ -163,9 +187,7 @@ class LocalProcess(Process):
 
     def _terminate(self):
         '''
-        Terminate the underlaying execution.
-        @TODO: Kill is NEEDED in real life? Or is signal.SIGTERM ok?
-        @TODO: SIGKILL does not work on windows, use signal.SIGTERM
+        Terminates the underlaying execution.
         '''
         # @see https://stackoverflow.com/questions/4789837/how-to-terminate-a-python-subprocess-launched-with-shell-true
         os.killpg(os.getpgid(self._process.pid), signal.SIGTERM)  # Send the signal to all the process groups
@@ -173,8 +195,7 @@ class LocalProcess(Process):
     def _kill(self):
         '''
         Kills the underlaying execution.
-        @TODO: Kill is NEEDED in real life? Or is signal.SIGTERM ok?
-        @TODO: SIGKILL does not work on windows, use signal.SIGTERM
+        @TODO verify: SIGKILL does not work on windows? use signal.SIGTERM maybe?
         '''
         # @see https://stackoverflow.com/questions/4789837/how-to-terminate-a-python-subprocess-launched-with-shell-true
         os.killpg(os.getpgid(self._process.pid), signal.SIGKILL)  # Send the signal to all the process groups
