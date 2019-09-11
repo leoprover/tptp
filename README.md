@@ -3,6 +3,16 @@
 # Installation
 
 # Usage
+## Run pre configurated solver:
+```
+python3 -m tptp solve --solver-name "leo3" --problem "problems/SYN001+1.p" --timeout 60
+```
+
+## Run example competition:
+```
+python3 -m tptp competition --configuration chrisCasc/chrisPrivateCasc.py
+```
+
 ## Run System-on-TPTP:
 
 List all solvers
