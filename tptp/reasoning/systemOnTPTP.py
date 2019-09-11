@@ -11,17 +11,40 @@ from .core import Solver, SolverCall, SolverType, SolverResult
 from ..utils.concurrent.httpRequest import AsyncPostRequest
 
 class SystemOnTPTPSolver(Solver):
-    def __init__(self, name: str, command: str, inputLanguages: List[TPTPInputLanguage],
-                 applications: List[SolverType]):
-        super().__init__(name, command)
+    def __init__(self, name: str, *,
+        systemOnTPTPName: str,
+        command: str, 
+        version: str= None,
+        prettyName: str= None,
+        inputLanguages: List[TPTPInputLanguage]= [],
+        applications: List[SolverType]= [],
+    ):
+        super().__init__(
+            name=name,
+            prettyName=prettyName,
+            command=command, 
+            version=version,
+        )
+        self._systemOnTPTPName = systemOnTPTPName
         self._inputLanguages = inputLanguages
         self._applications = applications
 
     def __repr__(self):
-        return ','.join([self._name, self._command, ' '.join(map(lambda x: str(x),self._inputLanguages)), ' '.join(map(lambda x: str(x),self._applications))])
+        return ', '.join([
+            str(self._name), 
+            str(self._prettyName),
+            str(self._systemOnTPTPName),
+            str(self._version),
+            str(self._command), 
+            ' '.join(map(lambda x: str(x),self._inputLanguages)), 
+            ' '.join(map(lambda x: str(x),self._applications))],
+        )
 
     def name(self):
         return self._name
+
+    def systemOnTPTPName(self):
+        return self._systemOnTPTPName
 
     def command(self):
         return self._command
@@ -107,9 +130,9 @@ class SystemOnTPTPSolverCall(SolverCall):
             'QuietFlag': '-q01',  # for output mode System
             # 'QuietFlag':'-q3', #for output mode Result
             'SubmitButton': 'RunSelectedSystems',
-            'System___' + self._solver.name(): self._solver.name(),
-            'TimeLimit___' + self._solver.name(): str(self._calculatedTimeout),
-            'Command___' + self._solver.name(): self._solver.command(),
+            'System___' + self._solver.systemOnTPTPName(): self._solver.systemOnTPTPName(),
+            'TimeLimit___' + self._solver.systemOnTPTPName(): str(self._calculatedTimeout),
+            'Command___' + self._solver.systemOnTPTPName(): self._solver.command(),
         }
         self._request = AsyncPostRequest(URL_SYSTEM_ON_TPTP_FORM, payload, self._calculatedTimeout)
         self._request.start()

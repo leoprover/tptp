@@ -19,7 +19,11 @@ class CliToolSystemOnTPTP(CliToolBase):
         elif args.task == 'request':
             path = Path(args.problem)
             problem = Problem.readFromFile(path)
-            solver = SystemOnTPTPSolver(args.solver_name, args.solver_command, [], [])
+            solver = SystemOnTPTPSolver(
+                name=args.solver_name,
+                systemOnTPTPName=args.solver_name, 
+                command=args.solver_command,
+            )
             call = solver.call(problem, timeout=args.timeout)
             result = call.run()
             print('CALL', call)

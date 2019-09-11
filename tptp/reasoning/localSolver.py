@@ -7,14 +7,31 @@ from .core import Solver, SolverCall, SolverType, SolverResult
 from ..utils.concurrent.localProcess import LocalProcess
 
 class LocalSolver(Solver):
-    def __init__(self, name: str, command: str, inputLanguages: List[TPTPInputLanguage],
-                 applications: List[SolverType]):
-        super().__init__(name, command)
+    def __init__(self, name: str, *,
+        command: str, 
+        version: str= None,
+        prettyName: str= None,
+        inputLanguages: List[TPTPInputLanguage]= [],
+        applications: List[SolverType]= [],
+    ):
+        super().__init__(
+            name=name, 
+            prettyName=prettyName,
+            command=command,
+            version=version,
+        )
         self._inputLanguages = inputLanguages
         self._applications = applications
 
     def __repr__(self):
-        return ','.join([self._name, self._command, ' '.join(map(lambda x: str(x),self._inputLanguages)), ' '.join(map(lambda x: str(x),self._applications))])
+        return ', '.join([
+            str(self._name), 
+            str(self._prettyName),
+            str(self._version),
+            str(self._command), 
+            ' '.join(map(lambda x: str(x), self._inputLanguages)), 
+            ' '.join(map(lambda x: str(x), self._applications))],
+        )
 
     def name(self):
         return self._name
