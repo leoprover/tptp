@@ -5,18 +5,8 @@
 * clone this repository
 
 ## Usage
-### Run an example competition:
-```
-$ python3 -m tptp competition competition-test/definition.py
-```
-
-Run with more output. Good for error tracking.
-```
-$ python3 -m tptp competition competition-test/definition.py --verbose
-```
 
 ### Run locally:
-
 List all solvers
 ```
 python3 -m tptp local list-solvers
@@ -44,6 +34,16 @@ Run Leo III.
 $ python3 -m tptp system-on-tptp request --solver-name "Leo-III---1.4" --solver-command "run_Leo-III %s %d" --problem "problems/SYN001+1.p" 
 ```
 
+### Test the competition mode
+```
+$ python3 -m tptp competition competition-test/definition.py
+```
+
+Run with more output. Good for error tracking.
+```
+$ python3 -m tptp competition competition-test/definition.py --verbose
+```
+
 ## Making a solver TPTP ready
 ### SZS Status, SZS Ontology
 A solver can be used by this libary if it supports the SZS Ontology as its result on the ```stdout```.
@@ -56,15 +56,12 @@ For instance, a SAT-solver started for problem ```SYN001+1``` should output the 
 ```
 as part of its output if it proves the problem is ```satisfiable```.
 
-```% SZS status Unsatisfiable for SYN001+1``` 
-if it proves the problem is ```unsatisfiable```.
+Consequently:
+* if your solver proves the problem is ```unsatisfiable```, the line ```% SZS status Unsatisfiable for SYN001+1```.
+* if your solver ```gives up``` the prove, the line ```% SZS status Giveup for SYN001+1```.
+* a full list of possible values for the SZS Status can be found at the [SZS Ontology](http://www.tptp.org/cgi-bin/SeeTPTP?Category=Documents&File=SZSOntology) definition.
 
-```% SZS status Giveup for SYN001+1``` 
-if ```gives up``` the prove. And so on.
-
-[SZS Ontology](http://www.tptp.org/cgi-bin/SeeTPTP?Category=Documents&File=SZSOntology) provies a full list of possible values for the SZS Status.
-
-Any prove of prove-model should be printed on the stdout in the following form
+Any prove or prove-model should additionally be printed on the stdout in the following form.
 ```
 % SZS output start CNFRefutation for SYN001+1
   ...
