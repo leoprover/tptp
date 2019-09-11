@@ -24,9 +24,13 @@ class CliToolLocalSolver(CliToolBase):
                 name=args.solver_name,
             )
             call = solver.call(problem, timeout=args.timeout)
+            print('Calling', call)
+            
             result = call.run()
-            print('CALL', call)
-            print('RESULT', result)
+            print(result)
+            if result.exception():
+                print(result.exception())
+
         elif args.task == 'request':
             path = Path(args.problem)
             problem = Problem.readFromFile(path)
@@ -35,10 +39,10 @@ class CliToolLocalSolver(CliToolBase):
                 command=args.solver_command,
             )
             call = solver.call(problem, timeout=args.timeout)
-            result = call.run()
             print('Calling', call)
+            
+            result = call.run()
             print(result)
-            print(result.output())
             if result.exception():
                 print(result.exception())
 

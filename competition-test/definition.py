@@ -13,15 +13,16 @@ COMPETITION_NAME = "Test DIMACS CNF Competition"
 SOLVERS = (
     {
         'type': 'local',
-        'name': 'picosat',
-        'command': './solvers/picosat-tptp.sh -L %d %s',
-    },
-    {
-        'type': 'local',
         'name': 'nitpick',
         'version': '2018',
         'pretty-name': 'Nitpick',
         'command': 'nitpick %d %s',
+        'encoding': 'tptp-cnf',
+    },
+    {
+        'type': 'local',
+        'name': 'picosat',
+        'command': './solvers/picosat-tptp.sh -L %d %s',
     },
     {
         'type': 'local',

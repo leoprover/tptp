@@ -2,6 +2,8 @@ import re
 from pathlib import Path
 from .szs import SZSStatus
 
+class InvalidSourceError(Exception):
+    pass
 
 class Problem:
     def __init__(self, name:str, source, problem:str):
@@ -13,6 +15,12 @@ class Problem:
         return self._name
 
     def problem(self):
+        if not self._problem:
+            try:
+                path = Path(self._source)
+                self._problem = path.read_text()
+            except Exception as e:
+                raise InvalidSourceError(e)
         return self._problem
 
     def name(self):
@@ -20,6 +28,7 @@ class Problem:
 
     def source(self):
         return self._source
+
 
     @classmethod
     def readFromFile(cls,path:Path):

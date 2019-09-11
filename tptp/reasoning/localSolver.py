@@ -1,6 +1,7 @@
 from typing import List
 import re
 
+from ..encoding.encodingChooser import getEncoder
 from ..core import Problem, TPTPInputLanguage, SZSStatus
 from .core import Solver, SolverCall, SolverType, SolverResult
 
@@ -11,6 +12,7 @@ class LocalSolver(Solver):
         command: str, 
         version: str= None,
         prettyName: str= None,
+        encoding: str=None,
         inputLanguages: List[TPTPInputLanguage]= [],
         applications: List[SolverType]= [],
     ):
@@ -20,6 +22,7 @@ class LocalSolver(Solver):
             command=command,
             version=version,
         )
+        self._encoding = encoding
         self._inputLanguages = inputLanguages
         self._applications = applications
 
@@ -94,6 +97,8 @@ class LocalSolverCall(SolverCall):
         self._problem = problem
         self._solver = solver
         self._timeout = timeout
+        if solver._encoding:
+            problem = getEncoder(problem, solver._encoding).encode(problem, tempSource=True).newProblem
         self._process = LocalProcess(
             timeout=timeout, 
             call=lambda t: self._generateCall(problem, timeout=t)

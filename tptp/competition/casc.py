@@ -96,9 +96,3 @@ class CASC(Competition):
             verbose=verbose,
         )
 
-def main(configurationModulePath:Path):
-    casc = configure(configurationModulePath)
-    print(casc)
-
-if __name__ == '__main__':
-   main(Path(sys.argv[1]))

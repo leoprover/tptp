@@ -28,9 +28,8 @@ class CliToolCompetition(CliToolBase):
             sys.exit(1)
         
         competitionClass = CliToolCompetition.AVAILABLE_COMPETITIONS.get(configuration.COMPETITION_TYPE)
-        #print(competitionClass)
         competitionInstance = competitionClass.configure(configurationModulePath, 
-            verbose=args.verbose
+            verbose=args.verbose,
         )
         competitionInstance.run()
 
