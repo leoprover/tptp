@@ -6,16 +6,17 @@ import signal
 logger = logging.getLogger(__name__)
 
 from .timer import Timer
-from .process import Process
+from .process import Process, NotYetStartedError
 
-class LocalProcess(Process):    
+
+class LocalProcess(Process):
     INITIALIZED = 1
     
     STARTED = 2
     FORCED_TERMINATE_SEND = 3
     FORCED_KILL_SEND = 4
 
-    CANCLED = 5
+    CANCELLED = 5
     COMPLETED = 6
     TIMEOUT = 7
     FORCED_TERMINATED = 8
@@ -52,7 +53,7 @@ class LocalProcess(Process):
         """
         Whether the process is done with execution.
         """
-        return self._state >= self.CANCLED
+        return self._state >= self.CANCELLED
 
     def isTimeout(self) -> bool:
         """
@@ -64,13 +65,13 @@ class LocalProcess(Process):
         """
         Whether the process has beed tried to be canceled, terminated or killed.
         """
-        return self._state in [self.FORCED_TERMINATE_SEND, self.FORCED_KILL_SEND, self.CANCLED, self.FORCED_TERMINATED, self.FORCED_KILLED]
+        return self._state in [self.FORCED_TERMINATE_SEND, self.FORCED_KILL_SEND, self.CANCELLED, self.FORCED_TERMINATED, self.FORCED_KILLED]
 
     def isCanceled(self) -> bool:
         """
         Whether the process has beed canceled.
         """
-        return self._state == self.CANCLED
+        return self._state == self.CANCELLED
 
     def isTerminated(self) -> bool:
         """
@@ -106,11 +107,8 @@ class LocalProcess(Process):
             self._call_calculated = self._call(self._timeout_calculated)
         else:
             self._call_calculated = self._call
-        # TODO better splitting
-        if isinstance(self._call_calculated, str):
-            self._call_calculated = self._call_calculated.split(' ')
 
-        if self._state == self.CANCLED:
+        if self._state == self.CANCELLED:
             return
 
         self.timer.start()
@@ -134,6 +132,7 @@ class LocalProcess(Process):
             stderr=subprocess.PIPE, # store the stderr in in the subprocess itself
             preexec_fn=os.setsid,
             env=os.environ,  # use the environment of the python instance, s.t. we can set enviroment variables for started subprocesses
+            shell=True,
         )
 
     def calculatedCall(self):
@@ -166,7 +165,7 @@ class LocalProcess(Process):
     def cancle(self):
         if self.isStarted():
             return False
-        self._state = self.CANCLED
+        self._state = self.CANCELLED
 
     def terminate(self):
         self._state = self.FORCED_TERMINATE_SEND

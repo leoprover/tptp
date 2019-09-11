@@ -108,7 +108,12 @@ class LocalSolverCall(SolverCall):
 
         call = self._process.calculatedCall()
         if stdout:
-            szs = re.search('% SZS status ([^ ]+)', stdout, re.I).group(1)      
+            g = re.search('% SZS status ([^ ]+)', stdout, re.I)
+            if not g:
+                szs = "Error"
+            else:
+                szs = g.group(1)
+
             #cpu = float(re.search('(?:.*CPU = )(.*)(?: WC.*)', stdout, re.I).group(1))
             #wc = float(re.search('(?:.*WC = )(\S*)(?: .*)', stdout, re.I).group(1))      
         elif self._process.isTimeout():
@@ -116,7 +121,7 @@ class LocalSolverCall(SolverCall):
         elif self._process.isInterupted():
             szs = "User"
         else:
-            raise NotImplementedError()
+            szs = "Error"
 
         return LocalSolverResult(
             call=call,

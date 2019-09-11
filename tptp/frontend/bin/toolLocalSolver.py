@@ -18,7 +18,6 @@ class CliToolLocalSolver(CliToolBase):
         problem = Problem.readFromFile(path)
         solver = LocalSolver(args.solver_name, args.solver_command, [], [])
         call = solver.call(problem, timeout=args.timeout)
-        print(solver)
         result = call.run()
         print('CALL', call)
         print('RESULT', result)
