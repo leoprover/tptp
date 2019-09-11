@@ -62,12 +62,14 @@ class LocalSolverResult(SolverResult):
         stderr:str, 
         returnCode:int,
         exception:Exception,
+        command:str,
     ):
         super().__init__(call, szs, cpu, wc)
         self._stdout = stdout
         self._stderr = stderr
         self._returnCode = returnCode
         self._exception = exception
+        self._command = command
 
     def stdout(self):
         return self._stdout
@@ -75,11 +77,17 @@ class LocalSolverResult(SolverResult):
     def stderr(self):
         return self._stderr
 
+    def output(self):
+        return self.stdout()
+
     def returnCode(self):
         return self._returnCode
 
     def exception(self):
         return self._exception
+
+    def command(self):
+        return self._command
 
 class LocalSolverCall(SolverCall):
     def __init__(self, problem:Problem, *, solver:LocalSolver, timeout):
@@ -93,11 +101,14 @@ class LocalSolverCall(SolverCall):
 
     def _generateCall(self, problem, *, timeout) -> str:
         c0 = self._solver.command()
+        # filename
         c1 = c0.replace('%s', str(problem.source()))
+        # timeout in s
         c2 = c1.replace('%d', str(int(timeout)))
+        # timeout in ms
+        c3 = c2.replace('%md', str(int(timeout*1000)))
 
-        return c2
-
+        return c3
 
     def isStarted(self) -> bool:
         return self._process.isStarted()
@@ -150,6 +161,7 @@ class LocalSolverCall(SolverCall):
             stderr=stderr,
             returnCode=returncode,
             exception=exception,
+            command=self._process.calculatedCall(),
         )
 
     def cancel(self) -> None:

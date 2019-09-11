@@ -34,9 +34,14 @@ class ProblemWithStatus(Problem):
     def __repr__(self):
         return self._name + " " + str(self._szs)
 
+    def __str__(self):
+        return '{name} expecting {szs}'.format(
+            name=self._name,
+            szs=self._szs,
+        )
+
     def szs(self):
         return self._szs
-
 
 class TPTPProblem(ProblemWithStatus):
     def __init__(self, name:str, source, problem:str, szs:SZSStatus):

@@ -15,6 +15,12 @@ class Solver():
     def __repr__(self):
         return ', '.join([self._name, self._prettyName, self._version, self._command])
 
+    def __str__(self):
+        return '{name}{version}'.format(
+            name=self._prettyName if self._prettyName else self._name,
+            version=" "+str(self._version) if self._version else '',
+        )
+
     def name(self):
         return self._name
 

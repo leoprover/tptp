@@ -44,7 +44,7 @@ class CASC(Competition):
             print("No results so far.")
         lastResult = results[len(results)-1]
         szsResultMatches = lastResult._szs.matches(lastResult._call._problem.szs())
-        print(lastResult._call._solver._name, "says", lastResult._szs, "which is", szsResultMatches)
+        print(lastResult, "which is", szsResultMatches)
 
     def run(self):
         self._running = True
@@ -56,8 +56,20 @@ class CASC(Competition):
                 result = call.run()
                 self.addResult(result)
         self._running = False
-        print(self._results)
 
+        print()
+        print('Detailed:')
+        for r in self.results():
+            print(r)
+            print(r.command())
+            
+            exception = r.exception()
+            if exception:
+                print(exception)
+            print(r.output())
+            print(r.stderr())
+            print('-----------------------------------------')
+        
     def results(self) -> List[SolverResult]:
         return self._results
 

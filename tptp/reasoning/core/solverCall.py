@@ -1,6 +1,13 @@
 from .solverResult import SolverResult
 
 class SolverCall:
+    def __str__(self):
+        return '{problem} with {solver} -t {timeout}s'.format(
+            solver=self._solver,
+            problem=self._problem,
+            timeout=self.estimatedTimeout(),
+        )
+
     def run(self) -> SolverResult:
         """
         Runs the reasoning call.

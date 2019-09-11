@@ -5,7 +5,7 @@ from pathlib import Path
 COMPETITION_TYPE = "CASC"
 
 # name of the competition
-COMPETITION_NAME = "Chris' private CASC 2019"
+COMPETITION_NAME = "Test Competition"
 
 # tuples of name and command of all solvers as list
 # %s is the placeholder for a filename
@@ -13,20 +13,8 @@ COMPETITION_NAME = "Chris' private CASC 2019"
 SOLVERS = (
     {
         'type': 'local',
-        'pretty-name': 'Leo-III',
-        'name': 'leo3',
-        'command': 'leo3 %s -t %d',
-    },
-    {
-        'type': 'local',
         'name': 'cvc4',
         'command': 'cvc4 --output-lang tptp --produce-models --tlimit=%md %s',
-    },
-    {
-        'type': 'local',
-        'pretty-name': 'Satallax',
-        'name': 'satallax',
-        'command': 'satallax %s -t %d',
     },
 )
 
@@ -34,8 +22,8 @@ SOLVERS = (
 # subdirectory structures are supported
 basePath = Path(os.path.dirname(os.path.abspath(__file__))) / 'problems'
 PROBLEMS = (
-    (basePath / 'problem1.p', 'Theorem'),
-    (basePath / 'problem2.p', 'Theorem'),
+    (basePath / 'Sat1.cnf', 'Theorem'),
+    (basePath / 'Unsat1.cnf', 'Unsatisfiable'),
 )
 
 # maximum wall clock time

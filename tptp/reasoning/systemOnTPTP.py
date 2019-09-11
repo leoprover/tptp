@@ -97,12 +97,23 @@ def getSolvers() -> List[SystemOnTPTPSolver]:
 
     ret = []
     for name, command, formats, applications in zip(solverNames,solverCommands,solverFormats,solverApplications):
-        ret.append(SystemOnTPTPSolver(name,command,formats,applications))
+        ret.append(SystemOnTPTPSolver(
+            name=name,
+            systemOnTPTPName=name,
+            command=command,
+            inputLanguages=formats,
+            applications=applications
+        ))
     return ret
 
 class SystemOnTPTPSolverResult(SolverResult):
-    def __init__(self, call, szs: SZSStatus, cpu: float, wc: float):
+    def __init__(self, call, szs: SZSStatus, cpu: float, wc: float, response):
         super().__init__(call, szs, cpu, wc)
+
+        self._response = response
+
+    def output(self):
+        return self._response
 
 class SystemOnTPTPSolverCall(SolverCall):
     def __init__(self, problem:Problem, *, solver:SystemOnTPTPSolver, timeout):
@@ -145,7 +156,8 @@ class SystemOnTPTPSolverCall(SolverCall):
         if not self._request.done():
             raise Exception("Reasoning call has not been finished.")
         # % RESULT: SOT_WZbJQt - Leo-III---1.4 says Theorem - CPU = 0.00 WC = 0.04
-        self._response = self._request.result()
+        response = self._request.result()
+
         results = re.findall('^% RESULT:.*', self._response.text , re.M)
         if results == []: # TODO better error reporting
             raise Exception("Response not interpretable: Could not find RESULT token.\n" + self._response.text)
@@ -154,7 +166,13 @@ class SystemOnTPTPSolverCall(SolverCall):
         szs = re.search('(?:.*says )(.*)(?: - CPU.*)', results[0], re.I).group(1)
         cpu = float(re.search('(?:.*CPU = )(.*)(?: WC.*)', results[0], re.I).group(1))
         wc = float(re.search('(?:.*WC = )(\S*)(?: .*)', results[0], re.I).group(1))
-        return SystemOnTPTPSolverResult(self, SZSStatus.get(szs), cpu, wc)
+
+        return SystemOnTPTPSolverResult(self, 
+            szs=SZSStatus.get(szs), 
+            cpu=cpu, 
+            wc=wc,
+            response=response,
+        )
 
     def wait(self) -> None:
         self._request.wait()

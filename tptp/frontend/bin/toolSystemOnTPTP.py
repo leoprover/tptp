@@ -4,7 +4,6 @@ from ...core.problem import Problem
 from ...reasoning.systemOnTPTP import getSolvers, SystemOnTPTPSolver
 from .toolBase import CliToolBase
 
-
 class CliToolSystemOnTPTP(CliToolBase):
     def __init__(self, name: str):
         super().__init__(name)

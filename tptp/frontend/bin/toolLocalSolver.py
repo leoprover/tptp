@@ -3,7 +3,7 @@ from pathlib import Path
 from ...core.problem import Problem
 from ...reasoning.localSolver import LocalSolver, LocalSolverCall
 from .toolBase import CliToolBase
-from ...reasoning import loadSolvers
+from ...reasoning import getLocalSolvers, getLocalSolver
 
 class CliToolLocalSolver(CliToolBase):
     def __init__(self, name: str):
@@ -15,11 +15,11 @@ class CliToolLocalSolver(CliToolBase):
 
     def run(self, args):
         if args.task == 'list-solvers':
-            print(solvers.getLocalSolvers())
+            print(getLocalSolvers())
         elif args.task == 'run':
             path = Path(args.problem)
             problem = Problem.readFromFile(path)
-            solver = solvers.getLocalSolver(
+            solver = getLocalSolver(
                 name=args.solver_name,
             )
             call = solver.call(problem, timeout=args.timeout)

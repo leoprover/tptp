@@ -64,8 +64,7 @@ def loadSolversAsDict(solverDefinitions):
                 command = s['command'],
             )
 
-    if split:
-        return _localSolver, _systemOnTptpSolver
+    return _localSolver, _systemOnTptpSolver
 
 def loadSolvers(solverDefinitions, split=False):
     _solvers = []

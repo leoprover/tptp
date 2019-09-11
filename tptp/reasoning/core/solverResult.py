@@ -11,3 +11,14 @@ class SolverResult:
     def __repr__(self):
         return ','.join(map(lambda x: str(x), [self._szs,self._cpu,self._wc,self._call]))
 
+    def __str__(self):
+        return '{szsStatus} for {call}'.format(
+            call=self._call,
+            szsStatus=self._szs,
+        )
+
+    def output(self):
+        """
+        The raw tptp-conform output of the solver
+        """
+        raise NotImplementedError()
