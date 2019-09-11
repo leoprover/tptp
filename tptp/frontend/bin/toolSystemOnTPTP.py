@@ -14,7 +14,8 @@ class CliToolSystemOnTPTP(CliToolBase):
 
     def run(self, args):
         if args.task == 'list-solvers':
-            print(getSolvers())
+            for s in getSolvers():
+                print(s)
         elif args.task == 'request':
             path = Path(args.problem)
             problem = Problem.readFromFile(path)

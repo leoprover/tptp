@@ -15,7 +15,8 @@ class CliToolLocalSolver(CliToolBase):
 
     def run(self, args):
         if args.task == 'list-solvers':
-            print(getLocalSolvers())
+            for s in getLocalSolvers():
+                print(s)
         elif args.task == 'run':
             path = Path(args.problem)
             problem = Problem.readFromFile(path)

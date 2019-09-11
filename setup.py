@@ -6,12 +6,12 @@ HERE = pathlib.Path(__file__).parent
 README = (HERE / "README.md").read_text()
 
 setup(name='tptp',
-    version='0.0.0',
+    version='0.0.1',
     description='A library for handling TPTP related input and systems',
     classifiers=[
         'Programming Language :: Python :: 3.5',
     ],
-    #keywords='asd',
+    #keywords='TPTP',
     license='BSD3',
     packages=find_packages(),
     #package_data={'': ['*.json','*.tex']},
