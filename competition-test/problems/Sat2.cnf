@@ -1,0 +1,26 @@
+c This is a *.cnf file.
+c Lines starting with 'c' are comments.
+c
+c Each .cnf file must contain a 'problem' line.  The syntax is as follows:
+c     p cnf #vars #clauses
+c where #vars is the number of variables, and #clauses is the number of clauses
+c
+c The problem line for this file is:
+
+p cnf 5 5
+
+c Thus, this file contains a problem with 5 variables and 5 clauses.
+c
+c Variables are represented by the integers 1, 2, 3, .., #vars.
+c Negated variables are represented by negative integers -1, -2, -3, .., -#vars.
+c A clause is represented by a sequence of integers followed by a '0' and a newline.
+c A single clause may span multiple lines.
+c
+c The following are the clauses for this file:
+
+1 2 3 4 5 0
+-1 -2 -3 -4 -5 0
+1 -2
+3 -4 5 0
+5 0
+-1 2 0

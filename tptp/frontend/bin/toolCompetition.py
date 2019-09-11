@@ -32,4 +32,4 @@ class CliToolCompetition(CliToolBase):
         competitionInstance.run()
 
     def parseArgs(self, toolSubParser):
-        toolSubParser.add_argument('--configuration', help='configuration file of the competition', required=True)
+        toolSubParser.add_argument('configuration', help='configuration file of the competition')
