@@ -30,6 +30,11 @@ class ReasoningScheduler():
         """
         raise NotImplementedError()
 
+    def runningCalls() -> Iterable[SolverCall]:
+        """
+        Iterator over all running calls.
+        """
+
     def numParallel():
         """
         Number of parallel executions. This number should not exceed the number of available cpu cores. 
@@ -43,11 +48,20 @@ class ReasoningScheduler():
         """
         return len(self.enquedCalls())
 
-    def estimatedTimeout() -> float:
+    def numRunning():
         """
-        Estimated timeout of all enqued solver call.
+        Number of running calles.
+        Override of speedup.
+        """
+        return len(self.runningCalls())
+
+    def estimatedRuntimeLeft() -> float:
+        """
+        Estimated runtime left of all a enqued solver call if any call is reaching its timeout.
         """
         t = 0
         for call in self.enquedCalls():
-            t += call.estimatedTimeout()
+            t += call.estimatedRuntimeLeft()
+        for call in self.runningCalls():
+            t += call.estimatedRuntimeLeft()
         return t

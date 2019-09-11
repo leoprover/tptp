@@ -81,14 +81,20 @@ class LocalSolverCall(SolverCall):
 
         return c2
 
-    def started(self) -> bool:
-        self._process.isStarted()
+    def isStarted(self) -> bool:
+        return self._process.isStarted()
 
-    def running(self) -> bool:
-        self._process.isRunning()
+    def isRunning(self) -> bool:
+        return self._process.isRunning()
 
-    def done(self) -> bool:
-        self._process.isDone()
+    def isDone(self) -> bool:
+        return self._process.isDone()
+
+    def timeScheduled(self) -> float:
+        return self._process.timeScheduled()
+
+    def timeRunning(self) -> float:
+        return self._process.timeRunning()
 
     def run(self):
         exception = None
@@ -139,12 +145,12 @@ class LocalSolverCall(SolverCall):
         Since a timeout can be a float or a callable object the timeout is evaluated when the method start is invoked.
         :return:
         """
-        self._process.timeout()
+        return self._process.timeout()
 
-    def estimatedTimeout(self):
+    def estimatedTimeout(self) -> float:
         """
         Estimated timeout of the call. If the timeouts has allready been calculatd the result is equal to ```timeout()```.
         Otherwise timeout is precalulated and may be differ from the finally used timeout.
         :return:
         """
-        self._process.estimatedTimeout()
+        return self._process.estimatedTimeout()

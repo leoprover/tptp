@@ -10,29 +10,41 @@ class SolverCall:
         Use concurrent.futures.Executor.submit to run this in a different thread
         :return:
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
-    def started(self) -> bool:
+    def isStarted(self) -> bool:
         """
         Indicates whether the reasoning call has already started.
         A suspended call is considered started.
         :return:
         """
-        raise NotImplementedError
+        raise NotImplementedError()
     
-    def running(self) -> bool:
+    def isRunning(self) -> bool:
         """
         Indicates whether the reasoning call is currently running.
         :return:
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
-    def done(self) -> bool:
+    def isDone(self) -> bool:
         """
         Checks whether the reasoning call is finished and the reasoning result is available.
         :return:
         """
-        raise NotImplementedError
+        raise NotImplementedError()
+
+    def timeScheduled(self) -> float:
+        """
+        Time the process is scheduled and not started (calling run) in seconds.
+        """
+        raise NotImplementedError()
+
+    def timeRunning(self) -> float:
+        """
+        Time the process is running (call of run) in seconds.
+        """
+        raise NotImplementedError()
 
     def cancle(self) -> None:
         """
@@ -40,6 +52,7 @@ class SolverCall:
         If the reasoning call is already finished this method doesnot have any effect.
         :return:
         """
+        raise NotImplementedError()
     
     def terminate(self) -> None:
         """
@@ -48,7 +61,7 @@ class SolverCall:
         If the reasoning call is already finished this method doesnot have any effect.
         :return:
         """
-        raise NotImplementedError
+        raise NotImplementedError()
     
     def kill(self) -> None:
         """
@@ -57,7 +70,7 @@ class SolverCall:
         If the reasoning call is already finished this method doesnot have any effect.
         :return:
         """
-        raise NotImplementedError
+        raise NotImplementedError()
     
     def timeout(self) -> float:
         """
@@ -65,14 +78,23 @@ class SolverCall:
         Otherwise timeout is precalulated and may be differ from the finally used timeout.
         :return:
         """
-        raise NotImplementedError
+        raise NotImplementedError()
     
     def estimatedTimeout(self) -> float:
         """
         Returns calculated the timeout if one is available, otherwise it precalculates the timeout a gives an estimation.
         :return:
         """
-        raise NotImplementedError
+        raise NotImplementedError()
+
+    def estimatedRuntimeLeft(self) -> float:
+        """
+        Estimated runtime left of the solver call if it is reaching its timeout.
+        :return:
+        """
+        if self.isDone():
+            return 0
+        return self.estimatedTimeout() - self.timeRunning()
 
     # the following is optional
     #def suspend(self) -> None:
