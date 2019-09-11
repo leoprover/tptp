@@ -26,7 +26,6 @@ class Problem:
         fileContent = path.read_text()
         return cls(str(path.name), path.absolute(), fileContent)
 
-
 class ProblemWithStatus(Problem):
     def __init__(self, name: str, source, problem: str, szs:SZSStatus):
         super().__init__(name, source, problem)

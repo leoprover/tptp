@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from ...core.problem import Problem
-from ...reasoning.systemOnTPTP import getSolvers, SystemOnTPTPSolver, SystemOnTPTPSolverCall
+from ...reasoning.systemOnTPTP import getSolvers, SystemOnTPTPSolver
 from .toolBase import CliToolBase
 
 
@@ -20,10 +20,8 @@ class CliToolSystemOnTPTP(CliToolBase):
             path = Path(args.problem)
             problem = Problem.readFromFile(path)
             solver = SystemOnTPTPSolver(args.solver_name, args.solver_command, [], [])
-            call = SystemOnTPTPSolverCall(solver, problem, args.timeout)
-            call.start()
-            call.wait()
-            result = call.result()
+            call = solver.call(problem, timeout=args.timeout)
+            result = call.run()
             print('CALL', call)
             print('RESULT', result)
 

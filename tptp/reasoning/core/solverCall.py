@@ -1,62 +1,100 @@
 from .solverResult import SolverResult
+
 class SolverCall:
-    def start(self) -> None:
+    def run(self) -> SolverResult:
         """
-        Starts the reasoning call.
+        Runs the reasoning call.
+        This is a blocking method.
+        May be called in a different thread.
+
+        Use concurrent.futures.Executor.submit to run this in a different thread
         :return:
         """
-        raise NotImplementedError
+        raise NotImplementedError()
+
     def isStarted(self) -> bool:
         """
         Indicates whether the reasoning call has already started.
         A suspended call is considered started.
         :return:
         """
-        raise NotImplementedError
-    def done(self) -> bool:
+        raise NotImplementedError()
+    
+    def isRunning(self) -> bool:
+        """
+        Indicates whether the reasoning call is currently running.
+        :return:
+        """
+        raise NotImplementedError()
+
+    def isDone(self) -> bool:
         """
         Checks whether the reasoning call is finished and the reasoning result is available.
         :return:
         """
-        raise NotImplementedError
-    def result(self) -> SolverResult:
+        raise NotImplementedError()
+
+    def timeScheduled(self) -> float:
         """
-        Returns the result of a started reasoning call.
-        This is a blocking method.
-        If the reasoning call has not been started this method will throw an exception.
+        Time the process is scheduled and not started (calling run) in seconds.
+        """
+        raise NotImplementedError()
+
+    def timeRunning(self) -> float:
+        """
+        Time the process is running (call of run) in seconds.
+        """
+        raise NotImplementedError()
+
+    def cancle(self) -> None:
+        """
+        If the reasoning call has not been started the start will be prevented.
+        If the reasoning call is already finished this method doesnot have any effect.
         :return:
         """
-        raise NotImplementedError
+        raise NotImplementedError()
+    
     def terminate(self) -> None:
         """
-        Cancels the reasoning call asking the recipient (CLI tool, etc.) of the reasoning call to terminate.
-        If the reasoning call has not been started this method will throw an exception.
+        Terminates the reasoning call asking the recipient (CLI tool, etc.) of the reasoning call to terminate.
+        If the reasoning call has not been started the start will be prevented.
         If the reasoning call is already finished this method doesnot have any effect.
         :return:
         """
-        raise NotImplementedError
+        raise NotImplementedError()
+    
     def kill(self) -> None:
         """
-        Cancels the reasoning call without asking the the recipient (CLI tool, etc.) of the reasoning call to terminate.
-        If the reasoning call has not been started this method will throw an exception.
+        Cancels the reasoning call without asking the the recipient (CLI tool, etc.) of the reasoning call to kill.
+        If the reasoning call has not been started the start will be prevented.
         If the reasoning call is already finished this method doesnot have any effect.
         :return:
         """
-        raise NotImplementedError
-    def calculatedTimeout(self) -> float:
+        raise NotImplementedError()
+    
+    def timeout(self) -> float:
         """
-        Returns calculated the timeout.
-        If the reasoning call has not been started this method will throw an exception.
-        Since a timeout can be a float or a callable object the timeout is evaluated when the method start is invoked.
+        Estimated timeout of the call. If the timeouts has allready been calculatd the result is equal to ```timeout()```.
+        Otherwise timeout is precalulated and may be differ from the finally used timeout.
         :return:
         """
-        raise NotImplementedError
-    def timeout(self):
+        raise NotImplementedError()
+    
+    def estimatedTimeout(self) -> float:
         """
-        Returns the timeout if it is a float or the callable object that calculates the timeout during the start method.
+        Returns calculated the timeout if one is available, otherwise it precalculates the timeout a gives an estimation.
         :return:
         """
-        raise NotImplementedError
+        raise NotImplementedError()
+
+    def estimatedRuntimeLeft(self) -> float:
+        """
+        Estimated runtime left of the solver call if it is reaching its timeout.
+        :return:
+        """
+        if self.isDone():
+            return 0
+        return self.estimatedTimeout() - self.timeRunning()
 
     # the following is optional
     #def suspend(self) -> None:

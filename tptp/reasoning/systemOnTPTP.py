@@ -5,14 +5,10 @@ from pathlib import Path
 import requests
 import re
 
-from .core.solverResult import SolverResult
-from .core.solverCall import SolverCall
-from .core.solverType import SolverType
-from ..core.problem import Problem
-from ..core.tptpInputLanguages import TPTPInputLanguage
-from ..core.szs import SZSStatus
-from ..reasoning.core.solver import Solver
-from ..util.concurrent.httpRequest import AsyncPostRequest
+from ..core import Problem, TPTPInputLanguage, SZSStatus
+from .core import Solver, SolverCall, SolverType, SolverResult
+
+from ..utils.concurrent.httpRequest import AsyncPostRequest
 
 class SystemOnTPTPSolver(Solver):
     def __init__(self, name: str, command: str, inputLanguages: List[TPTPInputLanguage],
@@ -35,6 +31,13 @@ class SystemOnTPTPSolver(Solver):
 
     def applications(self):
         return self._applications
+
+    def call(self, problem:Problem, *, timeout):
+        return SystemOnTPTPSolverCall(
+            problem=problem, 
+            solver=self, 
+            timeout=timeout
+        )
 
 def getSolvers() -> List[SystemOnTPTPSolver]:
     URL_SYSTEM_ON_TPTP = 'http://www.tptp.org/cgi-bin/SystemOnTPTP' # TODO put this into a config
@@ -79,7 +82,7 @@ class SystemOnTPTPSolverResult(SolverResult):
         super().__init__(call, szs, cpu, wc)
 
 class SystemOnTPTPSolverCall(SolverCall):
-    def __init__(self, solver:SystemOnTPTPSolver, problem:Problem, timeout):
+    def __init__(self, problem:Problem, *, solver:SystemOnTPTPSolver, timeout):
         self._solver = solver
         self._problem = problem
         self._timeout = timeout
@@ -133,44 +136,7 @@ class SystemOnTPTPSolverCall(SolverCall):
     def wait(self) -> None:
         self._request.wait()
 
-def parse_args():
-    parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers()
-
-    requestparser = subparsers.add_parser('request')
-    requestparser.set_defaults(task='request')
-    requestparser.add_argument('--solver-name', help='name of the solver', required=True)
-    requestparser.add_argument('--solver-command', help='command of the solver', required=True)
-    requestparser.add_argument('--problem', help='path to problem file', required=True)
-    requestparser.add_argument('--timeout', help='timeout in seconds (default is 60)', type=int)
-    requestparser.set_defaults(timeout=60)
-
-    listParser = subparsers.add_parser('list-solvers')
-    listParser.set_defaults(task='list-solvers')
-
-    args = parser.parse_args()
-    return(args)
-
-def main():
-    # example arguments: request --solver-name "Leo-III---1.4" --solver-command "run_Leo-III %s %d" --problem "/home/tg/true.p" --timeout 60
-    args = parse_args()
-    if args.task == 'list-solvers':
-        print(getSolvers())
-    elif args.task == 'request':
-        path = Path(args.problem)
-        problem = Problem.readFromFile(path)
-        solver = SystemOnTPTPSolver(args.solver_name, args.solver_command, [], [])
-        call = SystemOnTPTPSolverCall(solver, problem, args.timeout)
-        call.start()
-        call.wait()
-        result = call.result()
-        print('CALL',call)
-        print('RESULT',result)
-
-if __name__ == '__main__':
-   main()
-
-
-
-
-
+    def run(self) -> SystemOnTPTPSolverResult:
+        self.start()
+        self.wait()
+        return self.result()
