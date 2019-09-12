@@ -15,6 +15,11 @@ SOLVERS = (
     },
     {
         'type': 'local',
+        'name': 'picosat',
+        'command': './solvers/picosat-tptp.sh -L %d %s',
+    },
+    {
+        'type': 'local',
         'name': 'satisfiable-dummy',
         'command': './solvers/satisfiable-dummy.sh %s -t %d',
     },

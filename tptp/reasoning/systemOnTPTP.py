@@ -165,11 +165,11 @@ class SystemOnTPTPSolverCall(SolverCall):
         # % RESULT: SOT_WZbJQt - Leo-III---1.4 says Theorem - CPU = 0.00 WC = 0.04
         response = self._request.result()
 
-        results = re.findall('^% RESULT:.*', self._response.text , re.M)
+        results = re.findall('^% RESULT:.*', response.text , re.M)
         if results == []: # TODO better error reporting
-            raise Exception("Response not interpretable: Could not find RESULT token.\n" + self._response.text)
+            raise Exception("Response not interpretable: Could not find RESULT token.\n" + response.text)
         elif len(results) > 1:
-            raise Exception("Response not interpretable: More than one RESULT token.\n" + self._response.text)
+            raise Exception("Response not interpretable: More than one RESULT token.\n" + response.text)
         szs = re.search('(?:.*says )(.*)(?: - CPU.*)', results[0], re.I).group(1)
         cpu = float(re.search('(?:.*CPU = )(.*)(?: WC.*)', results[0], re.I).group(1))
         wc = float(re.search('(?:.*WC = )(\S*)(?: .*)', results[0], re.I).group(1))
@@ -188,3 +188,10 @@ class SystemOnTPTPSolverCall(SolverCall):
         self.start()
         self.wait()
         return self.result()
+
+    def estimatedTimeout(self):
+        if self._calculatedTimeout:
+            return self._calculatedTimeout
+        if hasattr(self._timeout, '__call__'):
+            return self._timeout()
+        return self._timeout

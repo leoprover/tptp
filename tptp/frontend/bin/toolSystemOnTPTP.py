@@ -25,9 +25,15 @@ class CliToolSystemOnTPTP(CliToolBase):
                 command=args.solver_command,
             )
             call = solver.call(problem, timeout=args.timeout)
+            
+            print('% SZS status Started for {}'.format(call))
             result = call.run()
-            print('CALL', call)
-            print('RESULT', result)
+            print('% SZS status {result}'.format(
+                result=result,
+            ))
+
+            if args.verbose:
+                print(result.output())
 
     def parseArgs(self, toolParser):
         toolSubParsers = toolParser.add_subparsers()
@@ -37,6 +43,10 @@ class CliToolSystemOnTPTP(CliToolBase):
         requestparser.add_argument('--solver-command', help='command of the solver', required=True)
         requestparser.add_argument('--problem', help='path to problem file', required=True)
         requestparser.add_argument('--timeout', help='timeout in seconds (default is 60)', type=int)
+        requestparser.add_argument('--verbose',
+            help='generates a more verbose output',
+            action='store_const', default=False, const=True,
+        )
         requestparser.set_defaults(timeout=60)
 
         listParser = toolSubParsers.add_parser('list-solvers')
