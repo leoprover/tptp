@@ -58,7 +58,7 @@ as part of its output if it proves the problem is ```satisfiable```.
 
 Consequently:
 * if your solver proves the problem is ```unsatisfiable```, the line ```% SZS status Unsatisfiable for SYN001+1```.
-* if your solver ```gives up``` the prove, the line ```% SZS status Giveup for SYN001+1```.
+* if your solver ```gaves up``` the prove, the line ```% SZS status GaveUp for SYN001+1```.
 * a full list of possible values for the SZS Status can be found at the [SZS Ontology](http://www.tptp.org/cgi-bin/SeeTPTP?Category=Documents&File=SZSOntology) definition.
 
 Any prove or prove-model should additionally be printed on the stdout in the following form.

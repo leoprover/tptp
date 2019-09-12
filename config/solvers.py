@@ -28,4 +28,9 @@ SOLVERS = (
         'name': 'unsatisfiable-dummy',
         'command': './solvers/unsatisfiable-dummy.sh %s -t %d',
     },
+    {
+        'type': 'local',
+        'name': 'gaveup-dummy',
+        'command': './solvers/gaveup-dummy.sh %s -t %d',
+    },
 )
