@@ -15,6 +15,11 @@ SOLVERS = (
     },
     {
         'type': 'local',
+        'name': 'picosat',
+        'command': './solvers/picosat-tptp.sh -L %d %s',
+    },
+    {
+        'type': 'local',
         'name': 'satisfiable-dummy',
         'command': './solvers/satisfiable-dummy.sh %s -t %d',
     },
@@ -22,5 +27,10 @@ SOLVERS = (
         'type': 'local',
         'name': 'unsatisfiable-dummy',
         'command': './solvers/unsatisfiable-dummy.sh %s -t %d',
+    },
+    {
+        'type': 'local',
+        'name': 'gaveup-dummy',
+        'command': './solvers/gaveup-dummy.sh %s -t %d',
     },
 )

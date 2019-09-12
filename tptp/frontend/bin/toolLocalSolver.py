@@ -24,12 +24,17 @@ class CliToolLocalSolver(CliToolBase):
                 name=args.solver_name,
             )
             call = solver.call(problem, timeout=args.timeout)
-            print('Calling', call)
             
+            print('% SZS status Started for {}'.format(call))
             result = call.run()
-            print(result)
+            print('% SZS status {result}'.format(
+                result=result,
+            ))
             if result.exception():
                 print(result.exception())
+            if args.verbose:
+                print(result.output())
+                print(result.stderr())
 
         elif args.task == 'request':
             path = Path(args.problem)
@@ -39,12 +44,17 @@ class CliToolLocalSolver(CliToolBase):
                 command=args.solver_command,
             )
             call = solver.call(problem, timeout=args.timeout)
-            print('Calling', call)
-            
+
+            print('% SZS status Started for {}'.format(call))
             result = call.run()
-            print(result)
+            print('% SZS status {result}'.format(
+                result=result,
+            ))
             if result.exception():
                 print(result.exception())
+            if args.verbose:
+                print(result.output())
+                print(result.stderr())
 
     def parseArgs(self, toolParser):
         toolSubParsers = toolParser.add_subparsers()
@@ -62,6 +72,10 @@ class CliToolLocalSolver(CliToolBase):
         requestparser.add_argument('--solver-name', help='name of the solver', required=True)
         requestparser.add_argument('--problem', help='path to problem file', required=True)
         requestparser.add_argument('--timeout', help='timeout in seconds (default is 60)', type=int)
+        requestparser.add_argument('--verbose',
+            help='generates a more verbose output',
+            action='store_const', default=False, const=True,
+        )
         requestparser.set_defaults(timeout=60)
 
         listParser = toolSubParsers.add_parser('list-solvers')

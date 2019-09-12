@@ -21,11 +21,11 @@ SOLVERS = (
         'name': 'unsatisfiable-dummy',
         'command': './solvers/unsatisfiable-dummy.sh %s -t %d',
     },
-    {
-        'type': 'local',
-        'name': 'picosat',
-        'command': './solvers/picosat-tptp.sh -L %d %s',
-    },
+#    {
+#        'type': 'local',
+#        'name': 'picosat',
+#        'command': './solvers/picosat-tptp.sh -L %d %s',
+#    },
 #    {
 #        'type': 'local',
 #        'name': 'nitpick',
