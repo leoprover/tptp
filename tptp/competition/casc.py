@@ -18,6 +18,7 @@ class CASC(Competition):
         wcLimit: int, 
         cpuLimit: int,
         verbose: bool= False,
+        silent:bool= False,
         colored: bool= False,
     ):
         super().__init__(name, solvers, problems, wcLimit, cpuLimit)
@@ -25,6 +26,7 @@ class CASC(Competition):
         self._running = False
         self._resultCallbacks = []
         self._verbose = verbose
+        self._silent = silent
         self._colored = colored
 
         if self._colored:
@@ -76,12 +78,17 @@ class CASC(Competition):
         exception = lastResult.exception()
         if exception:
             print(exception, file=sys.stderr)
-        if lastResult.szsStatus() == SZSStatus.get("Error"):
-            print(lastResult.stdout(), file=sys.stderr)
-            print(lastResult.stderr(), file=sys.stderr)
-        elif self._verbose:
-            print(lastResult.output())
-            print(lastResult.stderr())
+        if not self._silent:
+            if lastResult.szsStatus() == SZSStatus.get("Error"):
+                print(lastResult.stdout(), file=sys.stderr)
+                print(lastResult.stderr(), file=sys.stderr)
+            elif self._verbose:
+                print(lastResult.output())
+                print(lastResult.stderr())
+
+        # flush chunked output
+        sys.stdout.flush()
+        sys.stderr.flush()
 
     def run(self):
         self._running = True
@@ -102,6 +109,7 @@ class CASC(Competition):
     @staticmethod
     def configure(configurationModulePath:Path, *,
         verbose=False,
+        silent=False,
         colored=False,
     ):
         configuration = SourceFileLoader('configuration', str(configurationModulePath)).load_module()
@@ -115,6 +123,7 @@ class CASC(Competition):
             wcLimit=configuration.WC_TIMEOUT, 
             cpuLimit=configuration.CPU_TIMEOUT,
             verbose=verbose,
+            silent=silent,
             colored=colored,
         )
 
