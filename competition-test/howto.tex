@@ -1,0 +1,113 @@
+\documentclass[11pt,a4paper,english]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{fancyvrb}
+\usepackage{natbib}
+\usepackage{fancyref}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage[top=2cm,bottom=2cm,left=2cm,right=2cm]{geometry}
+
+\setlength\parindent{0pt}
+
+\title{KI 2019 Class - SAT Solving Competition}
+
+\begin{document}
+\maketitle
+
+\subsection*{Deadlines}
+\begin{itemize}
+\item \textit{Fri, 13. of Sep, evening}: Send us a \textit{tempory version} of your solver. We will try to get it running and give you feedback.
+\item \textit{Sun, 15. of Sep, 15:00}: You MAY send us an \textit{updated version} of your solver until 15:00, if you do so, we will use that one on monday. You can also submit up to three DIMACS CNF problems that will be employed during the final competition.
+\item \textit{Mon, 16. of Sep, morning}: We will run a pre-tournament on some test problems so you know what to expect from your competitors.
+\item \textit{Tue, 17. of Sep, before 11:45}: Send us the \textit{final version} of your solver.
+\item \textit{Tue, 17. of Sep, after lunch}: Final tournament.
+\end{itemize}
+Any solvers can be submitted to Marco by Mail, any questions will be answered by Marco and Tobias via Mail.
+\\
+\\
+Marco Träger \url{traeger@inf.fu-berlin.de}
+\\
+Tobias Gleißner \url{tobias.gleissner@fu-berlin.de}
+
+\subsection*{Solver Requirements}
+\subsubsection*{Misc}
+The prover should be able to be executed on a unix-like operating system. Please submit as an archive containing only source code and a file
+\texttt{INSTALL.md} that explains the requirements of the solver, its installation procedure and invocation on the command line in detail.
+Binaries will not be accepted.
+
+\subsubsection*{Input Format}
+The input format of the problems is DIMACS cnf.
+Each line of a problem may contain
+\begin{itemize}
+    \item a comment starting with character \texttt{c},
+    \item exactly once a description of the problem starting with character \texttt{p} followed by the number of atoms and the number of clauses, each separated by non-linebreaking whitespaces, and
+    \item a clause consisting of literals for which each literal can be a positive number if it is an atom or a negative number if it is a negated atom, the end for each clause is indicated by \texttt{0}
+          and all literals and \texttt{0} are separated by non-linebreaking whitespaces.
+\end{itemize}
+A problem will be passed to a solver through a filename parameter of the solver.
+\pagebreak
+\subsubsection*{Output Format}
+The output should conform to the TPTP SZS Ontology~\footnote{See \url{http://www.cs.miami.edu/home/geoff/Papers/Conference/2008_Sut08_KEAPPA-38-49.pdf}.}.
+In summary, this means if a solver found a problem to be satisfiable it should report
+\begin{Verbatim}
+% SZS status Satisfiable
+\end{Verbatim}
+If the problem is identified as unsatisfiable it should report
+\begin{Verbatim}
+% SZS status Unsatisfiable
+\end{Verbatim}
+If the solver was not able to find a solution it should report
+\begin{Verbatim}
+% SZS status GaveUp
+\end{Verbatim}
+The status has to be reported exactly once in a separate line of the standard output stream.
+
+\subsection*{Test your implementation}
+The competition will be conducted employing the python package \textit{tptp} which is available at
+\url{https://github.com/leoprover/tptp/releases/tag/0.0.1}. This package ships with a test competition containing some satisfiable and unsatisfiable
+CNF problems in DIMACS format.
+Download and extract this release of the \textit{tptp} python package.
+The package does not have to be installed. Python $\geq 3.5$ is required.
+
+The test competition consists of a directory \texttt{competition-test/problems} containing test problems and
+a configuration file \texttt{competition-test/definition.py}.
+The configuration file contains a python tuple \texttt{SOLVERS} whose elements are python dictionaries of which
+each represents a solver configuration.
+A solver configuration possesses the mandatory keys \texttt{'type'}, \texttt{'name'}, and \texttt{'command'}.
+\texttt{'type'} should always be set to \texttt{'local'}, \texttt{'name'} is a string representing the solver name,
+and \texttt{'command'} has to be set to the command that can invoke the solver from the command line.
+\texttt{'command'} should contain the substring \texttt{\%s} which will be replaced by an absolute filename
+on each invocation. An example solver configuration may look like this:
+\begin{Verbatim}
+SOLVERS = (
+    {
+        'type': 'local',
+        'name': 'my-solver',
+        'command': 'my-solver-binary-or-shell-script %s',
+    },
+)
+\end{Verbatim}
+\begin{sloppypar}
+Here, if an input problem \texttt{my-problem.cnf} is passed to the solver, the command
+\texttt{my-solver-binary-or-shell-script my-problem.cnf} will be executed on the command line.
+After the timeout defined in the competition configuration has come to pass or the solver is finished,
+the solver's SZS status is parsed and printed on the command line with its name and the expected status of the problem.
+\end{sloppypar}
+
+Adjust the configuration to contain your solver. Finally, you will be able to do the following:
+
+Run the test competition with all configured solvers by invoking
+\begin{Verbatim}
+python3 -m tptp competition competition-test/definition.py
+\end{Verbatim}
+from the repository root directory.
+\\
+\\
+Run the test competition with more output. Good for error tracking.
+\begin{Verbatim}
+python3 -m tptp competition competition-test/definition.py --verbose
+\end{Verbatim}
+
+\end{document}

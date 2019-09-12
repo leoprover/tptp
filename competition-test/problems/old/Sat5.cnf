@@ -13,7 +13,7 @@ c              that is associated with variable number N.
 c hanoi4.solution - solution to the problem.
 c
 c hanoi4.cnf can be solved by tableau (a backtracking-type algorithm
-c written by James Crawford and Larry Auton) in 3.2 hours on
+c written by James Crawford and Larry Auton) in 3.2 hours on 
 c an SGI Challenge workstation.
 c
 c For information about the program used to generate this problem
