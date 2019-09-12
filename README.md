@@ -98,6 +98,6 @@ Running our test competition should now list your solver.
 ```
 $ python3 -m tptp competition competition-test/definition.py
 ...
-% Satisfiable for Sat1.cnf expecting Satisfiable with MySolver -t 60s which is True
+% Satisfiable for Sat1.cnf expecting Satisfiable with MySolver -t 60s which is correct
 ...
 ```
