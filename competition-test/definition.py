@@ -13,14 +13,6 @@ COMPETITION_NAME = "Test DIMACS CNF Competition"
 SOLVERS = (
     {
         'type': 'local',
-        'name': 'nitpick',
-        'version': '2018',
-        'pretty-name': 'Nitpick',
-        'command': 'nitpick %d %s',
-        'encoding': 'tptp-cnf',
-    },
-    {
-        'type': 'local',
         'name': 'picosat',
         'command': './solvers/picosat-tptp.sh -L %d %s',
     },
@@ -34,6 +26,14 @@ SOLVERS = (
         'name': 'unsatisfiable-dummy',
         'command': './solvers/unsatisfiable-dummy.sh %s -t %d',
     },
+#    {
+#        'type': 'local',
+#        'name': 'nitpick',
+#        'version': '2018',
+#        'pretty-name': 'Nitpick',
+#        'command': 'nitpick %d %s',
+#        'encoding': 'tptp-cnf',
+#    },
 )
 
 # a directory containing problems as Path object

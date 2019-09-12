@@ -18,12 +18,18 @@ class CASC(Competition):
         wcLimit: int, 
         cpuLimit: int,
         verbose: bool= False,
+        colored: bool= False,
     ):
         super().__init__(name, solvers, problems, wcLimit, cpuLimit)
         self._results = []
         self._running = False
         self._resultCallbacks = []
         self._verbose = verbose
+        self._colored = colored
+
+        if self._colored:
+            from ..utils import color
+            self._color = color
 
     def __repr__(self):
         sb = []
@@ -52,7 +58,19 @@ class CASC(Competition):
 
         lastResult = results[len(results)-1]
         szsResultMatches = lastResult._szs.matches(lastResult._call._problem.szs())
-        print('%', lastResult, "which is", szsResultMatches)
+
+        if self._colored:
+            print('{color}% SZS status {result} "which is" {state}{reset}'.format(
+                result=lastResult,
+                state="correct" if szsResultMatches else "wrong",
+                color=self._color.Fore.GREEN if szsResultMatches else self._color.Fore.RED,
+                reset=self._color.RESET_ALL
+            ))
+        else:
+            print('% SZS status {result} "which is" {state}'.format(
+                result=lastResult,
+                state="correct" if szsResultMatches else "wrong",
+            ))
 
         # further output for error informations
         exception = lastResult.exception()
@@ -72,6 +90,8 @@ class CASC(Competition):
         for p in self._problems:
             for s in self._solvers:
                 call = s.call(p, timeout=wcLimit)
+                print('% SZS status Started for {}'.format(call))
+
                 result = call.run()
                 self.addResult(result)
         self._running = False
@@ -81,7 +101,8 @@ class CASC(Competition):
 
     @staticmethod
     def configure(configurationModulePath:Path, *,
-        verbose=False
+        verbose=False,
+        colored=False,
     ):
         configuration = SourceFileLoader('configuration', str(configurationModulePath)).load_module()
         solvers = loadSolvers(configuration.SOLVERS)
@@ -94,5 +115,6 @@ class CASC(Competition):
             wcLimit=configuration.WC_TIMEOUT, 
             cpuLimit=configuration.CPU_TIMEOUT,
             verbose=verbose,
+            colored=colored,
         )
 

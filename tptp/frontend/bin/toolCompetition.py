@@ -30,6 +30,7 @@ class CliToolCompetition(CliToolBase):
         competitionClass = CliToolCompetition.AVAILABLE_COMPETITIONS.get(configuration.COMPETITION_TYPE)
         competitionInstance = competitionClass.configure(configurationModulePath, 
             verbose=args.verbose,
+            colored=args.colored,
         )
         competitionInstance.run()
 
@@ -37,5 +38,9 @@ class CliToolCompetition(CliToolBase):
         toolSubParser.add_argument('configuration', help='configuration file of the competition')
         toolSubParser.add_argument('--verbose',
             help='generates a more verbose output',
+            action='store_const', default=False, const=True,
+        )
+        toolSubParser.add_argument('--colored',
+            help='prints with color',
             action='store_const', default=False, const=True,
         )
