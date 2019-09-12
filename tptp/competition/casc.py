@@ -59,16 +59,20 @@ class CASC(Competition):
             return
 
         lastResult = results[len(results)-1]
-        szsResultMatches = lastResult._szs.matches(lastResult._call._problem.szs())
+
+        szsResult = lastResult._szs
+        szsExspected = lastResult._call._problem.szs()
+
+        match = szsResult.matches(szsExspected)
 
         output = '% SZS status {result} which is {state}'.format(
             result=lastResult,
-            state="correct" if szsResultMatches else "wrong",
+            state=match,
         )
         if self._colored:
             print('{color}{output}{reset}'.format(
                 output=output,
-                color=self._color.Fore.GREEN if szsResultMatches else self._color.Fore.RED,
+                color=self._color.Fore.GREEN if match.isCorrect() else (self._color.Fore.YELLOW if match.isSound() else self._color.Fore.RED),
                 reset=self._color.RESET_ALL
             ))
         else:
