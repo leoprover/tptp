@@ -50,8 +50,6 @@ class SolverResult:
         """
         return self.call.problem.szs
 
-    def szsMatchesOntology(self):
+    def matches(self):
         return self.szsStatus.matches(self.call.problem.szs)
 
-    def szsMatchesExactly(self):
-        return self.szsStatus == self.call.problem.szs

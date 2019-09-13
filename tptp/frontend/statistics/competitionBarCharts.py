@@ -59,7 +59,7 @@ class SolvedPerSolverChart(SolvedChart):
         print(dictResults)
         solvers = sortSolvers(dictResults.keys())
         solverNames = list(map(lambda s: s.name + s.version if s.version else s.name, solvers))
-        sums = list(map(lambda s: len(dictResults[s]), solvers))
+        sums = list(map(lambda s: len(list(filter(lambda r: r.matches().isCorrect(), dictResults[s]))), solvers))
 
         print("NAMES",solverNames)
         print("SUMS",sums)
