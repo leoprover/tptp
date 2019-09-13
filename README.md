@@ -75,7 +75,7 @@ competition-test/definition.py
 ```
 
 Here you add your solver to the ```SOLVERS``` constant
-```
+```python
 SOLVERS = (
     ...
     {
