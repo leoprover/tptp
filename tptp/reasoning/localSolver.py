@@ -36,15 +36,19 @@ class LocalSolver(Solver):
             ' '.join(map(lambda x: str(x), self._applications))],
         )
 
+    @property
     def name(self):
         return self._name
 
+    @property
     def command(self) -> str:
         return self._command
 
+    @property
     def inputLanguages(self):
         return self._inputLanguages
 
+    @property
     def applications(self):
         return self._applications
 
@@ -74,21 +78,27 @@ class LocalSolverResult(SolverResult):
         self._exception = exception
         self._command = command
 
+    @property
     def stdout(self):
         return self._stdout
 
+    @property
     def stderr(self):
         return self._stderr
 
+    @property
     def output(self):
-        return self.stdout()
+        return self.stdout
 
+    @property
     def returnCode(self):
         return self._returnCode
 
+    @property
     def exception(self):
         return self._exception
 
+    @property
     def command(self):
         return self._command
 
@@ -105,9 +115,9 @@ class LocalSolverCall(SolverCall):
         )
 
     def _generateCall(self, problem, *, timeout) -> str:
-        c0 = self._solver.command()
+        c0 = self._solver.command
         # filename
-        c1 = c0.replace('%s', str(problem.source()))
+        c1 = c0.replace('%s', str(problem.source))
         # timeout in s
         c2 = c1.replace('%d', str(int(timeout)))
         # timeout in ms

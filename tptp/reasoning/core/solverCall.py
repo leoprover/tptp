@@ -8,9 +8,11 @@ class SolverCall:
             timeout=self.estimatedTimeout(),
         )
 
+    @property
     def solver(self):
         return self._solver
 
+    @property
     def problem(self):
         return self._problem
 

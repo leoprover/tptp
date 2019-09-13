@@ -43,18 +43,23 @@ class SystemOnTPTPSolver(Solver):
             ' '.join(map(lambda x: str(x),self._applications))],
         )
 
+    @property
     def name(self):
         return self._name
 
+    @property
     def systemOnTPTPName(self):
         return self._systemOnTPTPName
 
+    @property
     def command(self):
         return self._command
 
+    @property
     def inputLanguages(self):
         return self._inputLanguages
 
+    @property
     def applications(self):
         return self._applications
 
@@ -148,9 +153,9 @@ class SystemOnTPTPSolverCall(SolverCall):
             'QuietFlag': '-q01',  # for output mode System
             # 'QuietFlag':'-q3', #for output mode Result
             'SubmitButton': 'RunSelectedSystems',
-            'System___' + self._solver.systemOnTPTPName(): self._solver.systemOnTPTPName(),
-            'TimeLimit___' + self._solver.systemOnTPTPName(): str(self._calculatedTimeout),
-            'Command___' + self._solver.systemOnTPTPName(): self._solver.command(),
+            'System___' + self._solver.systemOnTPTPName: self._solver.systemOnTPTPName,
+            'TimeLimit___' + self._solver.systemOnTPTPName: str(self._calculatedTimeout),
+            'Command___' + self._solver.systemOnTPTPName: self._solver.command,
         }
         self._request = AsyncPostRequest(URL_SYSTEM_ON_TPTP_FORM, payload, self._calculatedTimeout)
         self._request.start()

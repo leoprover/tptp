@@ -23,9 +23,11 @@ class Problem:
                 raise InvalidSourceError(e)
         return self._problem
 
+    @property
     def name(self):
         return self._name
 
+    @property
     def source(self):
         return self._source
 
@@ -54,6 +56,7 @@ class ProblemWithStatus(Problem):
         """
         return self._szs
 
+    @property
     def szsStatus(self):
         return self._szs
 

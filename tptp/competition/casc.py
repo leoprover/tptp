@@ -61,12 +61,12 @@ class CASC(Competition):
             return
 
         result = results[len(results)-1]
-        call = result.call()
-        solver = call.solver()
-        problem = call.problem()
+        call = result.call
+        solver = call.solver
+        problem = call.problem
 
-        szsResult = result.szsStatus()
-        szsExspected = problem.szsStatus()
+        szsResult = result.szsStatus
+        szsExspected = problem.szsStatus
 
         match = szsResult.matches(szsExspected)
 
@@ -84,24 +84,23 @@ class CASC(Competition):
             print(output)
 
         if self._outputDir:
-            with open(self._outputDir / (solver.name() + ".output"), "a") as f:
+            with open(self._outputDir / (solver.name + ".output"), "a") as f:
                 print(output, file=f)
-            with open(self._outputDir / (solver.name() + "-" + problem.name() + ".stdout"), "w") as f:
-                print(result.stdout(), file=f)
-            with open(self._outputDir / (solver.name() + "-" + problem.name() + ".stderr"), "w") as f:
-                print(result.stderr(), file=f)
+            with open(self._outputDir / (solver.name + "-" + problem.name + ".stdout"), "w") as f:
+                print(result.stdout, file=f)
+            with open(self._outputDir / (solver.name + "-" + problem.name + ".stderr"), "w") as f:
+                print(result.stderr, file=f)
 
         # further output for error informations
-        exception = result.exception()
-        if exception:
-            print(exception, file=sys.stderr)
+        if result.exception:
+            print(result.exception, file=sys.stderr)
         if not self._silent:
-            if result.szsStatus() == SZSStatus.get("Error"):
-                print(result.stdout(), file=sys.stderr)
-                print(result.stderr(), file=sys.stderr)
+            if result.szsStatus == SZSStatus.get("Error"):
+                print(result.stdout, file=sys.stderr)
+                print(result.stderr, file=sys.stderr)
             elif self._verbose:
-                print(result.output())
-                print(result.stderr())
+                print(result.stdout)
+                print(result.stderr)
 
         # flush chunked output
         sys.stdout.flush()

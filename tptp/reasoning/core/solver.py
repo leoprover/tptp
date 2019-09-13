@@ -21,17 +21,22 @@ class Solver():
             version=" "+str(self._version) if self._version else '',
         )
 
+    @property
     def name(self):
         return self._name
 
+    @property
     def command(self):
         return self._command
 
+    @property
     def version(self):
         return self._version
 
+    @property
     def prettyName(self):
         return self._prettyName
 
+    @property
     def call(self, problem:Problem, *, timeout):
         raise NotImplementedError()
