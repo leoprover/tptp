@@ -12,6 +12,12 @@ class Solver():
         self._command = command
         self._version = version
 
+    def __hash__(self):
+        return hash(self._name + str(self._version))
+
+    def __eq__(self, other):
+        return self.__hash__() == other.__hash__()
+
     def __repr__(self):
         return ', '.join([self._name, self._prettyName, self._version, self._command])
 

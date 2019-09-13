@@ -1,4 +1,4 @@
-from tptp.core.szs import SZSStatus
+from ...core.szs import SZSStatus
 
 
 class SolverResult:
@@ -39,3 +39,19 @@ class SolverResult:
         The raw tptp-conform output of the solver
         """
         raise NotImplementedError()
+
+    def getProblem(self):
+        return self.call.problem
+
+    def getExpectedSzsStatus(self):
+        """
+        if available
+        :return:
+        """
+        return self.call.problem.szs
+
+    def szsMatchesOntology(self):
+        return self.szsStatus.matches(self.call.problem.szs)
+
+    def szsMatchesExactly(self):
+        return self.szsStatus == self.call.problem.szs
