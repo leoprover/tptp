@@ -158,9 +158,9 @@ class SZSStatus():
         return False
 
     def matches(self, other):
-        if self == SUC and not (other == SUC):
+        if self == self.SUC and not (other == self.SUC):
             return UNSOUND
-        if self._isAncestor(NOS):
+        if self._isAncestor(self.NOS):
             return NO_SUCCESS
         if self._isAncestor(other):
             return CORRECT
@@ -183,80 +183,80 @@ class SZSStatus():
 
 # SUCCESS
 # layer 7
-ETH = SZSStatus("ETH", "EquivalentTheorem",)
-TAU = SZSStatus("TAU", "Tautology",)
-WTC = SZSStatus("WTC", "WeakerTautologousConclusion",)
-WTH = SZSStatus("WTH", "WeakerTheorem",)
-TCA = SZSStatus("TCA", "TautologousConclusionContradictoryAxioms",)
-WCA = SZSStatus("WCA", "WeakerConclusionContradictoryAxioms",)
-UCA = SZSStatus("UCA", "UnsatisfiableConclusionContradictoryAxioms",)
-WCT = SZSStatus("WCT", "WeakerCounterTheorem",)
-WUC = SZSStatus("WUC", "WeakerUnsatisfiableConclusion",)
-UNS = SZSStatus("UNS", "Unsatisfiable",)
-ECT = SZSStatus("ECT", "EquivalentCounterTheorem",)
+SZSStatus.ETH = SZSStatus.EquivalentTheorem                               = SZSStatus("ETH", "EquivalentTheorem",)
+SZSStatus.TAU = SZSStatus.Tautology                                       = SZSStatus("TAU", "Tautology",)
+SZSStatus.WTC = SZSStatus.WeakerTautologousConclusion                     = SZSStatus("WTC", "WeakerTautologousConclusion",)
+SZSStatus.WTH = SZSStatus.WeakerTheorem                                   = SZSStatus("WTH", "WeakerTheorem",)
+SZSStatus.TCA = SZSStatus.TautologousConclusionContradictoryAxioms        = SZSStatus("TCA", "TautologousConclusionContradictoryAxioms",)
+SZSStatus.WCA = SZSStatus.WeakerConclusionContradictoryAxioms             = SZSStatus("WCA", "WeakerConclusionContradictoryAxioms",)
+SZSStatus.UCA = SZSStatus.UnsatisfiableConclusionContradictoryAxioms      = SZSStatus("UCA", "UnsatisfiableConclusionContradictoryAxioms",)
+SZSStatus.WCT = SZSStatus.WeakerCounterTheorem                            = SZSStatus("WCT", "WeakerCounterTheorem",)
+SZSStatus.WUC = SZSStatus.WeakerUnsatisfiableConclusion                   = SZSStatus("WUC", "WeakerUnsatisfiableConclusion",)
+SZSStatus.UNS = SZSStatus.Unsatisfiable                                   = SZSStatus("UNS", "Unsatisfiable",)
+SZSStatus.ECT = SZSStatus.EquivalentCounterTheorem                        = SZSStatus("ECT", "EquivalentCounterTheorem",)
 # layer 6
-EQV = SZSStatus("EQV", "Equivalent", [ETH, TAU])
-TAC = SZSStatus("TAC", "TautologousConclusion", [TAU, WTC])
-WEC = SZSStatus("WEC", "WeakerConclusion", [WTC, WTH])
-SCA = SZSStatus("SCA", "SatisfiableConclusionContradictoryAxioms", [TCA, WCA])
-SCC = SZSStatus("SCC", "SatisfiableCounterConclusionContradictoryAxioms", [WCA, UCA])
-WCC = SZSStatus("WCC", "WeakerCounterConclusion", [WCT, WUC])
-UNC = SZSStatus("UNC", "UnsatisfiableConclusion", [WUC, UNS])
-CEQ = SZSStatus("CEQ", "CounterEquivalent", [UNS, ECT])
+SZSStatus.EQV = SZSStatus.Equivalent                                      = SZSStatus("EQV", "Equivalent", [SZSStatus.ETH, SZSStatus.TAU])
+SZSStatus.TAC = SZSStatus.TautologousConclusion                           = SZSStatus("TAC", "TautologousConclusion", [SZSStatus.TAU, SZSStatus.WTC])
+SZSStatus.WEC = SZSStatus.WeakerConclusion                                = SZSStatus("WEC", "WeakerConclusion", [SZSStatus.WTC, SZSStatus.WTH])
+SZSStatus.SCA = SZSStatus.SatisfiableConclusionContradictoryAxioms        = SZSStatus("SCA", "SatisfiableConclusionContradictoryAxioms", [SZSStatus.TCA, SZSStatus.WCA])
+SZSStatus.SCC = SZSStatus.SatisfiableCounterConclusionContradictoryAxioms = SZSStatus("SCC", "SatisfiableCounterConclusionContradictoryAxioms", [SZSStatus.WCA, SZSStatus.UCA])
+SZSStatus.WCC = SZSStatus.WeakerCounterConclusion                         = SZSStatus("WCC", "WeakerCounterConclusion", [SZSStatus.WCT, SZSStatus.WUC])
+SZSStatus.UNC = SZSStatus.UnsatisfiableConclusion                         = SZSStatus("UNC", "UnsatisfiableConclusion", [SZSStatus.WUC, SZSStatus.UNS])
+SZSStatus.CEQ = SZSStatus.CounterEquivalent                               = SZSStatus("CEQ", "CounterEquivalent", [SZSStatus.UNS, SZSStatus.ECT])
 # layer 5
-STH = SZSStatus("STH", "SatisfiableTheorem", [EQV, TAC, WEC])
-CAX = SZSStatus("CAX", "ContradictoryAxioms", [SCA, SCC])
-SCT = SZSStatus("SCT", "SatisfiableCounterTheorem", [WCC, UNC, CEQ])
+SZSStatus.STH = SZSStatus.SatisfiableTheorem                              = SZSStatus("STH", "SatisfiableTheorem", [SZSStatus.EQV, SZSStatus.TAC, SZSStatus.WEC])
+SZSStatus.CAX = SZSStatus.ContradictoryAxioms                             = SZSStatus("CAX", "ContradictoryAxioms", [SZSStatus.SCA, SZSStatus.SCC])
+SZSStatus.SCT = SZSStatus.SatisfiableCounterTheorem                       = SZSStatus("SCT", "SatisfiableCounterTheorem", [SZSStatus.WCC, SZSStatus.UNC, SZSStatus.CEQ])
 # layer 4
-FSA = SZSStatus("FSA", "FinitelySatisfiable",)
-NOC = SZSStatus("NOC", "NoConsequence",)
-FUN = SZSStatus("FUN", "FinitelyUnsatisfiable", [UNS])
-FCS = SZSStatus("FCS", "FinitelyCounterSatisfiable",)
+SZSStatus.FSA = SZSStatus.FinitelySatisfiable                             = SZSStatus("FSA", "FinitelySatisfiable",)
+SZSStatus.NOC = SZSStatus.NoConsequence                                   = SZSStatus("NOC", "NoConsequence",)
+SZSStatus.FUN = SZSStatus.FinitelyUnsatisfiable                           = SZSStatus("FUN", "FinitelyUnsatisfiable", [SZSStatus.UNS])
+SZSStatus.FCS = SZSStatus.FinitelyCounterSatisfiable                      = SZSStatus("FCS", "FinitelyCounterSatisfiable",)
 # layer 3
-SAT = SZSStatus("SAT", "Satisfiable", [FSA, NOC])
-THM = SZSStatus("THM", "Theorem", [STH])
-CTH = SZSStatus("CTH", "CounterTheorem", [SCT])
-CSA = SZSStatus("CSA", "CounterSatisfiable", [NOC, FUN, FCS])
+SZSStatus.SAT = SZSStatus.Satisfiable                                     = SZSStatus("SAT", "Satisfiable", [SZSStatus.FSA, SZSStatus.NOC])
+SZSStatus.THM = SZSStatus.Theorem                                         = SZSStatus("THM", "Theorem", [SZSStatus.STH])
+SZSStatus.CTH = SZSStatus.CounterTheorem                                  = SZSStatus("CTH", "CounterTheorem", [SZSStatus.SCT])
+SZSStatus.CSA = SZSStatus.CounterSatisfiable                              = SZSStatus("CSA", "CounterSatisfiable", [SZSStatus.NOC, SZSStatus.FUN, SZSStatus.FCS])
 # layer 2
-ESA = SZSStatus("ESA", "EquiSatisfiable", [SAT])
-FTH = SZSStatus("FTH", "FiniteTheorem", [THM])
-ECS = SZSStatus("ECS", "EquiCounterSatisfiable", [CSA])
+SZSStatus.ESA = SZSStatus.EquiSatisfiable                                 = SZSStatus("ESA", "EquiSatisfiable", [SZSStatus.SAT])
+SZSStatus.FTH = SZSStatus.FiniteTheorem                                   = SZSStatus("FTH", "FiniteTheorem", [SZSStatus.THM])
+SZSStatus.ECS = SZSStatus.EquiCounterSatisfiable                          = SZSStatus("ECS", "EquiCounterSatisfiable", [SZSStatus.CSA])
 # layer 1
-UNP = SZSStatus("UNP", "UnsatisfiabilityPreserving", [ESA])
-SAP = SZSStatus("SAP", "SatisfiabilityPreserving", [ESA, THM])
-CSP = SZSStatus("CSP", "CounterSatisfiabilityPreserving", [CTH, ECS])
-CUP = SZSStatus("CUP", "CounterUnsatisfiabilityPreserving", [ECS])
+SZSStatus.UNP = SZSStatus.UnsatisfiabilityPreserving                      = SZSStatus("UNP", "UnsatisfiabilityPreserving", [SZSStatus.ESA])
+SZSStatus.SAP = SZSStatus.SatisfiabilityPreserving                        = SZSStatus("SAP", "SatisfiabilityPreserving", [SZSStatus.ESA, SZSStatus.THM])
+SZSStatus.CSP = SZSStatus.CounterSatisfiabilityPreserving                 = SZSStatus("CSP", "CounterSatisfiabilityPreserving", [SZSStatus.CTH, SZSStatus.ECS])
+SZSStatus.CUP = SZSStatus.CounterUnsatisfiabilityPreserving               = SZSStatus("CUP", "CounterUnsatisfiabilityPreserving", [SZSStatus.ECS])
 # layer 0
-SUC = SZSStatus("SUC", "Success", [UNP, SAP, FTH, CSP, CUP])
+SZSStatus.SUC = SZSStatus.Success                                         = SZSStatus("SUC", "Success", [SZSStatus.UNP, SZSStatus.SAP, SZSStatus.FTH, SZSStatus.CSP, SZSStatus.CUP])
 
 # NOSUCCESS
 # layer 6
-TYE = SZSStatus("TYE", "TypeError",)
+SZSStatus.TYE = SZSStatus.TypeError     = SZSStatus("TYE", "TypeError",)
 # layer 5
-USE = SZSStatus("USE", "UsageError",)
-SYE = SZSStatus("SYE", "SyntaxError",)
-SEE = SZSStatus("SEE", "SemanticError", [TYE])
-TMO = SZSStatus("TMO", "Timeout",)
-MMO = SZSStatus("MMO", "MemoryOut",)
+SZSStatus.USE = SZSStatus.UsageError    = SZSStatus("USE", "UsageError",)
+SZSStatus.SYE = SZSStatus.SyntaxError   = SZSStatus("SYE", "SyntaxError",)
+SZSStatus.SEE = SZSStatus.SemanticError = SZSStatus("SEE", "SemanticError", [SZSStatus.TYE])
+SZSStatus.TMO = SZSStatus.Timeout       = SZSStatus("TMO", "Timeout",)
+SZSStatus.MMO = SZSStatus.MemoryOut     = SZSStatus("MMO", "MemoryOut",)
 # layer 4
-OSE = SZSStatus("OSE", "OSError",)
-INE = SZSStatus("INE", "InputError", [USE, SYE, SEE])
-USR = SZSStatus("USR", "User",)
-RSO = SZSStatus("RSO", "ResourceOut", [TMO, MMO])
-INC = SZSStatus("INC", "Incomplete",)
-IAP = SZSStatus("IAP", "Inappropriate",)
+SZSStatus.OSE = SZSStatus.OSError       = SZSStatus("OSE", "OSError",)
+SZSStatus.INE = SZSStatus.InputError    = SZSStatus("INE", "InputError", [SZSStatus.USE, SZSStatus.SYE, SZSStatus.SEE])
+SZSStatus.USR = SZSStatus.User          = SZSStatus("USR", "User",)
+SZSStatus.RSO = SZSStatus.ResourceOut   = SZSStatus("RSO", "ResourceOut", [SZSStatus.TMO, SZSStatus.MMO])
+SZSStatus.INC = SZSStatus.Incomplete    = SZSStatus("INC", "Incomplete",)
+SZSStatus.IAP = SZSStatus.Inappropriate = SZSStatus("IAP", "Inappropriate",)
 # layer 3
-ERR = SZSStatus("ERR", "Error", [OSE, INE])
-FOR = SZSStatus("FOR", "Forced", [USR, RSO])
-GUP = SZSStatus("GUP", "GaveUp", [RSO, INC, ERR, IAP])
-NTY = SZSStatus("NTY", "NotTriedYet", )
+SZSStatus.ERR = SZSStatus.Error         = SZSStatus("ERR", "Error", [SZSStatus.OSE, SZSStatus.INE])
+SZSStatus.FOR = SZSStatus.Forced        = SZSStatus("FOR", "Forced", [SZSStatus.USR, SZSStatus.RSO])
+SZSStatus.GUP = SZSStatus.GaveUp        = SZSStatus("GUP", "GaveUp", [SZSStatus.RSO, SZSStatus.INC, SZSStatus.ERR, SZSStatus.IAP])
+SZSStatus.NTY = SZSStatus.NotTriedYet   = SZSStatus("NTY", "NotTriedYet", )
 # layer 2
-STP = SZSStatus("STP", "Stopped", [ERR, FOR, GUP])
-INP = SZSStatus("INP", "InProgress",)
-NTT = SZSStatus("NTT", "NotTried", [IAP, NTY])
+SZSStatus.STP = SZSStatus.Stopped       = SZSStatus("STP", "Stopped", [SZSStatus.ERR, SZSStatus.FOR, SZSStatus.GUP])
+SZSStatus.INP = SZSStatus.InProgress    = SZSStatus("INP", "InProgress",)
+SZSStatus.NTT = SZSStatus.NotTried      = SZSStatus("NTT", "NotTried", [SZSStatus.IAP, SZSStatus.NTY])
 # layer 1
-OPN = SZSStatus("OPN", "Open",)
-UNK = SZSStatus("UNK", "Unknown", [STP, INP, NTT])
-ASS = SZSStatus("ASS", "Assumed",)
+SZSStatus.OPN = SZSStatus.Open          = SZSStatus("OPN", "Open",)
+SZSStatus.UNK = SZSStatus.Unknown       = SZSStatus("UNK", "Unknown", [SZSStatus.STP, SZSStatus.INP, SZSStatus.NTT])
+SZSStatus.ASS = SZSStatus.Assumed       = SZSStatus("ASS", "Assumed",)
 # layer 0
-NOS = SZSStatus("NOS", "NoSuccess", [OPN, UNK, ASS])
+SZSStatus.NOS = SZSStatus.NoSuccess     = SZSStatus("NOS", "NoSuccess", [SZSStatus.OPN, SZSStatus.UNK, SZSStatus.ASS])

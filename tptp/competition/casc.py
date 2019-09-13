@@ -90,12 +90,14 @@ class CASC(Competition):
                 print(result.stdout, file=f)
             with open(self._outputDir / (solver.name + "-" + problem.name + ".stderr"), "w") as f:
                 print(result.stderr, file=f)
+                if result.exception:
+                    print(result.exception, file=f)
 
         # further output for error informations
         if result.exception:
             print(result.exception, file=sys.stderr)
         if not self._silent:
-            if result.szsStatus == SZSStatus.get("Error"):
+            if result.szsStatus == SZSStatus.Error:
                 print(result.stdout, file=sys.stderr)
                 print(result.stderr, file=sys.stderr)
             elif self._verbose:

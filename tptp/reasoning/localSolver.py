@@ -2,7 +2,7 @@ from typing import List
 import re
 
 from ..encoding.encodingChooser import getEncoder
-from ..core import Problem, TPTPInputLanguage, SZSStatus
+from ..core import Problem, TPTPInputLanguage, SZSStatus, UnknownSZSStatusError
 from .core import Solver, SolverCall, SolverType, SolverResult
 
 from ..utils.concurrent.localProcess import LocalProcess
@@ -151,21 +151,24 @@ class LocalSolverCall(SolverCall):
             exception = e
             returncode = None
 
+        szs = SZSStatus.Unknown
         if stdout:
             g = re.search('% SZS status ([^\s]+)', stdout, re.I)
-            if not g:
-                szs = SZSStatus.get("Error")
-            else:
-                szs = SZSStatus.get(g.group(1))
+            if g:
+                try:
+                    szs = SZSStatus.get(g.group(1))
+                except UnknownSZSStatusError:
+                    pass
 
             #cpu = float(re.search('(?:.*CPU = )(.*)(?: WC.*)', stdout, re.I).group(1))
-            #wc = float(re.search('(?:.*WC = )(\S*)(?: .*)', stdout, re.I).group(1))      
-        elif self._process.isTimeout():
-            szs = SZSStatus.get("Timeout")
-        elif self._process.isInterupted():
-            szs = SZSStatus.get("User")
-        else:
-            szs = SZSStatus.get("Error")
+            #wc = float(re.search('(?:.*WC = )(\S*)(?: .*)', stdout, re.I).group(1))
+        if szs == SZSStatus.Unknown:
+            if self._process.isTimeout():
+                szs = SZSStatus.Timeout
+            elif self._process.isInterupted():
+                szs = SZSStatus.User
+            else:
+                szs = SZSStatus.Error
 
         return LocalSolverResult(
             call=self,
