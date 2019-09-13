@@ -32,11 +32,14 @@ class CliToolCompetition(CliToolBase):
             verbose=args.verbose,
             silent=args.silent,
             colored=args.colored,
+            outputDir=Path(args.output) if args.output else None
         )
         competitionInstance.run()
 
     def parseArgs(self, toolSubParser):
-        toolSubParser.add_argument('configuration', help='configuration file of the competition')
+        toolSubParser.add_argument('configuration', 
+            help='configuration file of the competition'
+        )
         toolSubParser.add_argument('--verbose',
             help='generates a more verbose output',
             action='store_const', default=False, const=True,
@@ -48,4 +51,8 @@ class CliToolCompetition(CliToolBase):
         toolSubParser.add_argument('--colored',
             help='prints with color',
             action='store_const', default=False, const=True,
+        )
+        toolSubParser.add_argument('--output', 
+            help='dictionary where the output of the competition and all solvers should be stored',
+            required=False,
         )

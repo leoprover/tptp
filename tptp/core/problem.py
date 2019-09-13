@@ -29,7 +29,6 @@ class Problem:
     def source(self):
         return self._source
 
-
     @classmethod
     def readFromFile(cls,path:Path):
         fileContent = path.read_text()
@@ -50,6 +49,12 @@ class ProblemWithStatus(Problem):
         )
 
     def szs(self):
+        """
+        @depricated use szsStatus
+        """
+        return self._szs
+
+    def szsStatus(self):
         return self._szs
 
 class TPTPProblem(ProblemWithStatus):

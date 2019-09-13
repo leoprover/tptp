@@ -8,6 +8,12 @@ class SolverCall:
             timeout=self.estimatedTimeout(),
         )
 
+    def solver(self):
+        return self._solver
+
+    def problem(self):
+        return self._problem
+
     def run(self) -> SolverResult:
         """
         Runs the reasoning call.

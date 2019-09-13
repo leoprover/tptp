@@ -20,6 +20,7 @@ class CASC(Competition):
         verbose: bool= False,
         silent:bool= False,
         colored: bool= False,
+        outputDir: Path=None,
     ):
         super().__init__(name, solvers, problems, wcLimit, cpuLimit)
         self._results = []
@@ -28,6 +29,7 @@ class CASC(Competition):
         self._verbose = verbose
         self._silent = silent
         self._colored = colored
+        self._outputDir = outputDir
 
         if self._colored:
             from ..utils import color
@@ -58,15 +60,18 @@ class CASC(Competition):
             print("No results so far.")
             return
 
-        lastResult = results[len(results)-1]
+        result = results[len(results)-1]
+        call = result.call()
+        solver = call.solver()
+        problem = call.problem()
 
-        szsResult = lastResult._szs
-        szsExspected = lastResult._call._problem.szs()
+        szsResult = result.szsStatus()
+        szsExspected = problem.szsStatus()
 
         match = szsResult.matches(szsExspected)
 
         output = '% SZS status {result} which is {state}'.format(
-            result=lastResult,
+            result=result,
             state=match,
         )
         if self._colored:
@@ -78,17 +83,25 @@ class CASC(Competition):
         else:
             print(output)
 
+        if self._outputDir:
+            with open(self._outputDir / (solver.name() + ".output"), "a") as f:
+                print(output, file=f)
+            with open(self._outputDir / (solver.name() + "-" + problem.name() + ".stdout"), "w") as f:
+                print(result.stdout(), file=f)
+            with open(self._outputDir / (solver.name() + "-" + problem.name() + ".stderr"), "w") as f:
+                print(result.stderr(), file=f)
+
         # further output for error informations
-        exception = lastResult.exception()
+        exception = result.exception()
         if exception:
             print(exception, file=sys.stderr)
         if not self._silent:
-            if lastResult.szsStatus() == SZSStatus.get("Error"):
-                print(lastResult.stdout(), file=sys.stderr)
-                print(lastResult.stderr(), file=sys.stderr)
+            if result.szsStatus() == SZSStatus.get("Error"):
+                print(result.stdout(), file=sys.stderr)
+                print(result.stderr(), file=sys.stderr)
             elif self._verbose:
-                print(lastResult.output())
-                print(lastResult.stderr())
+                print(result.output())
+                print(result.stderr())
 
         # flush chunked output
         sys.stdout.flush()
@@ -115,6 +128,7 @@ class CASC(Competition):
         verbose=False,
         silent=False,
         colored=False,
+        outputDir: Path=None,
     ):
         configuration = SourceFileLoader('configuration', str(configurationModulePath)).load_module()
         solvers = loadSolvers(configuration.SOLVERS)
@@ -129,5 +143,6 @@ class CASC(Competition):
             verbose=verbose,
             silent=silent,
             colored=colored,
+            outputDir=outputDir,
         )
 
