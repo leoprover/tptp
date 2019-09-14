@@ -22,12 +22,13 @@ class CliToolCompetition(CliToolBase):
     def getInstance(cls):
         return cls('competition')
 
-
     def draw(self, results:List[SolverResult]):
-        pass
         if len(results) % len(self.competitionInstance.solvers()) == 0:
+            unsoundSolverSet = set(map(lambda r: r.call.solver, filter(lambda r: not r.matches().isSound(), results)))
+            unsoundString = ['unsound']*len(unsoundSolverSet)
+            unsoundSolvers = {k:v for k in unsoundSolverSet for v in unsoundString}
             chart = self.competitionInstance.getDefaultSolvedFigure()(self.competitionInstance.name(), results)
-            fig = chart.figure(solvedAxisWidth=len(self.competitionInstance.problems()))
+            fig = chart.figure(solvedAxisWidth=len(self.competitionInstance.problems()), text=unsoundSolvers)
             fig.show()
 
     def run(self, args):

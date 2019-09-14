@@ -41,7 +41,7 @@ class SolvedPerSolverChart(SolvedChart):
     def __init__(self, name: str, results: Iterable[SolverResult]):
         super().__init__(name, results)
 
-    def figure(self, orientation='h', solvedAxisWidth:int=None, coloring:Dict[Solver,str]=None):
+    def figure(self, orientation='h', solvedAxisWidth:int=None, coloring:Dict[Solver,str]=None, text:Dict[Solver,str]=None):
         dictResults = createDict(self.results)
         solvers = sortSolvers(dictResults.keys())
         solverNames = list(map(lambda s: s.name + s.version if s.version else s.name, solvers))
@@ -60,6 +60,11 @@ class SolvedPerSolverChart(SolvedChart):
             else:
                 colorList = list(range(len(solvers)))
 
+        if text:
+            textList = list(map(lambda s: text[s] if s in text else None, solvers))
+        else:
+            textList = None
+
         if orientation == 'h':
             xValues = sums
             yValues = solverNames
@@ -75,6 +80,8 @@ class SolvedPerSolverChart(SolvedChart):
             y=yValues,
             marker_color=colorList,
             orientation=orientation,
+            text=textList,
+            textposition='outside',
         ))
         xAxisDict = {
             'title': xTitle,
