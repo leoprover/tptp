@@ -167,7 +167,7 @@ class LocalSolverCall(SolverCall):
                 szs = SZSStatus.Timeout
             elif self._process.isInterupted():
                 szs = SZSStatus.User
-            else:
+            elif exception:
                 szs = SZSStatus.Error
 
         return LocalSolverResult(
