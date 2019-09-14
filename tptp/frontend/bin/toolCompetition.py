@@ -1,7 +1,9 @@
 import sys
 from importlib._bootstrap_external import SourceFileLoader
 from pathlib import Path
+from typing import Iterable, List
 
+from ...reasoning import SolverResult
 from .toolBase import CliToolBase
 from ...competition import casc
 
@@ -20,6 +22,13 @@ class CliToolCompetition(CliToolBase):
     def getInstance(cls):
         return cls('competition')
 
+
+    def draw(self, results:List[SolverResult]):
+        if len(results) % len(self.competitionInstance.solvers()) == 0:
+            chart = self.competitionInstance.getDefaultSolvedFigure()(self.name(), results)
+            fig = chart.figure(solvedAxisWidth=len(self.competitionInstance.problems()))
+            fig.show()
+
     def run(self, args):
         configurationModulePath = Path(args.configuration)
         configuration = SourceFileLoader('configuration', str(configurationModulePath)).load_module()
@@ -34,6 +43,8 @@ class CliToolCompetition(CliToolBase):
             colored=args.colored,
             outputDir=Path(args.output) if args.output else None
         )
+        self.competitionInstance = competitionInstance
+        competitionInstance.addResultCallback(self.draw)
         competitionInstance.run()
 
     def parseArgs(self, toolSubParser):

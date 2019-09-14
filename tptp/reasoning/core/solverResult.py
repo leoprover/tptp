@@ -48,8 +48,8 @@ class SolverResult:
         if available
         :return:
         """
-        return self.call.problem.szs
+        return self.call.problem.szs()
 
     def matches(self):
-        return self.szsStatus.matches(self.call.problem.szs)
+        return self.szsStatus.matches(self.call.problem.szs())
 

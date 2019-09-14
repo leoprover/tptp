@@ -5,8 +5,8 @@ from importlib.machinery import SourceFileLoader
 from typing import List, Callable, Iterable
 from pathlib import Path
 
+from ..frontend.statistics.competitionBarCharts import SolvedPerSolverChart
 from ..core import SZSStatus
-from ..reasoning.localSolver import LocalSolver
 from .competition import Competition
 from ..reasoning import Solver, SolverResult, loadSolvers
 from ..core import TPTPProblem, ProblemWithStatus
@@ -52,8 +52,11 @@ class CASC(Competition):
         for c in self._resultCallbacks:
             c(self._results)
 
-    def addResultCallback(self, callback:Callable[[List[SolverResult]], object]):
+    def addResultCallback(self, callback:Callable[[Iterable[SolverResult]], object]):
         self._resultCallbacks.append(callback)
+
+    def getDefaultSolvedFigure(self):
+        return SolvedPerSolverChart
 
     def resultString(self, results:List[SolverResult]):
         if len(results) == 0:
