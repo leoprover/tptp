@@ -1,3 +1,3 @@
 #!/bin/sh
-sleep 1000
+sleep 3
 echo "% SZS status Satisfiable"

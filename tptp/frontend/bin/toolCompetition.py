@@ -24,8 +24,9 @@ class CliToolCompetition(CliToolBase):
 
 
     def draw(self, results:List[SolverResult]):
+        pass
         if len(results) % len(self.competitionInstance.solvers()) == 0:
-            chart = self.competitionInstance.getDefaultSolvedFigure()(self.name(), results)
+            chart = self.competitionInstance.getDefaultSolvedFigure()(self.competitionInstance.name(), results)
             fig = chart.figure(solvedAxisWidth=len(self.competitionInstance.problems()))
             fig.show()
 
