@@ -38,26 +38,20 @@ class SolvedPerSolverChart(SolvedChart):
         dictResults = createDict(self.results)
         solvers = sortSolvers(dictResults.keys())
 
-        solverNames = []
-        sumCorrect = []
-        textList = []
-        for s in solvers:
-            solverNames.append(str(s))
-            sumCorrect.append(len(list(filter(lambda r: r.matches().isCorrect(), dictResults[s]))))
-            #sumUnsound = sumCorrect.append(len(list(filter(lambda r: r.matches().isUnsound(), dictResults[s]))))
-            timeCorrect = sum(map(lambda r: r.wc if r.matches().isCorrect() else 0, dictResults[s]))
-
-            textList.append('{m:02d}:{s:02d}.{ms:04d}{t}'.format(
-                m=int(timeCorrect/60),
-                s=int(timeCorrect)%60,
-                ms=int(timeCorrect*1000)%1000,
-                t=(' - ' + text[s]) if (s in text) else ''
-            ))
+        solvers = sortSolvers(dictResults.keys())
+        solverNames = list(map(lambda s: s.name + s.version if s.version else s.name, solvers))
+        sums = list(map(lambda s: len(list(filter(lambda r: r.matches().isCorrect(), dictResults[s]))), solvers))
 
         NAMES_TITLE = 'number of correct solutions'
         SOLVERS_TITLE = None
 
-        textPositions = list(map(lambda s: 'inside' if s > 0 else 'outside', sumCorrect))
+
+
+        if text:
+            textList = list(map(lambda s: text[s] if s in text else None, solvers))
+        else:
+            textList = None
+        textPositions = list(map(lambda s: 'inside' if s > 0 else 'outside', sums))
 
         if coloring:
             colorList = list(map(lambda s: coloring[s], solvers))
@@ -70,13 +64,13 @@ class SolvedPerSolverChart(SolvedChart):
                 colorList = list(range(len(solvers)))
 
         if orientation == 'h':
-            xValues = sumCorrect
+            xValues = sums
             yValues = solverNames
             xTitle = NAMES_TITLE
             yTitle = SOLVERS_TITLE
         else:
             xValues = solverNames,
-            yValues = sumCorrect
+            yValues = sums
             xTitle = SOLVERS_TITLE
             yTitle = NAMES_TITLE
 

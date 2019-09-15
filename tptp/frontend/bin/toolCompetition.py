@@ -28,11 +28,14 @@ class CliToolCompetition(CliToolBase):
 
     def draw(self, results:List[SolverResult]):
         unsoundSolverSet = set(map(lambda r: r.call.solver, filter(lambda r: not r.matches().isSound(), results)))
-        unsoundString = ['unsound']*len(unsoundSolverSet)
-        unsoundSolvers = {k:v for k in unsoundSolverSet for v in unsoundString}
-        
+        unsoundSolvers = {k:v for k in unsoundSolverSet for v in [' - unsound']*len(unsoundSolverSet)}
+        timeDict = {k:v for k in self.competitionInstance.solvers() for v in [0.0]*len(self.competitionInstance.solvers())}
+        for r in results:
+            if r.matches().isCorrect():
+                timeDict[r.call.solver] += r.wc
+        textDict = {k:str(round(v,4)) + unsoundSolvers.get(k,'') for (k,v) in timeDict.items()}
         chart = self.competitionInstance.getDefaultSolvedFigure()(self.competitionInstance.name(), results=results)
-        fig = chart.figure(solvedAxisWidth=len(self.competitionInstance.problems()), text=unsoundSolvers)
+        fig = chart.figure(solvedAxisWidth=len(self.competitionInstance.problems()), text=textDict)
         fig.show()
 
     def run(self, args):
