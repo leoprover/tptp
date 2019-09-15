@@ -1,17 +1,12 @@
 from typing import Iterable, Dict
 import plotly.graph_objects as go
 
+from .common import createDict, sortSolvers
 from ...utils.color import DECENT_COLORS, NAMED_CSS_COLORS
 from ...reasoning import SolverResult, Solver
 from .dummyResults import dummyResults
 
-def createDict(results:Iterable[SolverResult]):
-    d = {}
-    for r in results:
-        if not r.call.solver in d:
-            d[r.call.solver] = []
-        d[r.call.solver].append(r)
-    return d
+
 
 class SolvedChart:
     def __init__(self, name:str, *, results:Iterable[SolverResult]):
@@ -26,13 +21,6 @@ class SolvedChart:
 
     def saveFigure(self, width=None, height=None):
         pass # TODO
-
-
-def sortSolvers(solvers:Iterable[Solver]):
-    return sorted(solvers, key=(lambda s: s.name + str(s.version)))
-
-def sortedSolverNames(solvers:Iterable[Solver]):
-    return list(map(lambda s: s.name + s.version if s.version else s.name, sortSolvers(solvers)))
 
 class SolvedPerSolverChart(SolvedChart):
     """
@@ -69,6 +57,8 @@ class SolvedPerSolverChart(SolvedChart):
         NAMES_TITLE = 'number of correct solutions'
         SOLVERS_TITLE = None
 
+        textPositions = list(map(lambda s: 'inside' if s > 0 else 'outside', sumCorrect))
+
         if coloring:
             colorList = list(map(lambda s: coloring[s], solvers))
         else:
@@ -89,6 +79,7 @@ class SolvedPerSolverChart(SolvedChart):
             yValues = sumCorrect
             xTitle = SOLVERS_TITLE
             yTitle = NAMES_TITLE
+
         fig = go.Figure(data=[
             go.Bar(
                 x=xValues,
@@ -96,7 +87,7 @@ class SolvedPerSolverChart(SolvedChart):
                 marker_color=colorList,
                 orientation=orientation,
                 text=textList,
-                textposition='outside',
+                textposition=textPositions,
             ),
         ])
         xAxisDict = {
