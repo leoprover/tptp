@@ -14,7 +14,7 @@ def createDict(results:Iterable[SolverResult]):
     return d
 
 class SolvedChart:
-    def __init__(self, name:str, results:Iterable[SolverResult]):
+    def __init__(self, name:str, *, results:Iterable[SolverResult]):
         self.name = name
         self.results = results
 
@@ -38,16 +38,35 @@ class SolvedPerSolverChart(SolvedChart):
     """
     Every solver possesses one bar that accounts for successfully solved problems.
     """
-    def __init__(self, name: str, results: Iterable[SolverResult]):
-        super().__init__(name, results)
+    def __init__(self, name: str, *, results: Iterable[SolverResult]):
+        super().__init__(name, results=results)
 
-    def figure(self, orientation='h', solvedAxisWidth:int=None, coloring:Dict[Solver,str]=None, text:Dict[Solver,str]=None):
+    def figure(self, *,
+        orientation='h', 
+        solvedAxisWidth:int=None, 
+        coloring:Dict[Solver,str]=None, 
+        text:Dict[Solver,str]=None
+    ):
         dictResults = createDict(self.results)
         solvers = sortSolvers(dictResults.keys())
-        solverNames = list(map(lambda s: s.name + s.version if s.version else s.name, solvers))
-        sums = list(map(lambda s: len(list(filter(lambda r: r.matches().isCorrect(), dictResults[s]))), solvers))
 
-        NAMES_TITLE = 'number of solutions'
+        solverNames = []
+        sumCorrect = []
+        textList = []
+        for s in solvers:
+            solverNames.append(str(s))
+            sumCorrect.append(len(list(filter(lambda r: r.matches().isCorrect(), dictResults[s]))))
+            #sumUnsound = sumCorrect.append(len(list(filter(lambda r: r.matches().isUnsound(), dictResults[s]))))
+            timeCorrect = sum(map(lambda r: r.wc if r.matches().isCorrect() else 0, dictResults[s]))
+
+            textList.append('{m:02d}:{s:02d}.{ms:04d}{t}'.format(
+                m=int(timeCorrect/60),
+                s=int(timeCorrect)%60,
+                ms=int(timeCorrect*1000)%1000,
+                t=(' - ' + text[s]) if (s in text) else ''
+            ))
+
+        NAMES_TITLE = 'number of correct solutions'
         SOLVERS_TITLE = None
 
         if coloring:
@@ -60,29 +79,26 @@ class SolvedPerSolverChart(SolvedChart):
             else:
                 colorList = list(range(len(solvers)))
 
-        if text:
-            textList = list(map(lambda s: text[s] if s in text else None, solvers))
-        else:
-            textList = None
-
         if orientation == 'h':
-            xValues = sums
+            xValues = sumCorrect
             yValues = solverNames
             xTitle = NAMES_TITLE
             yTitle = SOLVERS_TITLE
         else:
             xValues = solverNames,
-            yValues = sums
+            yValues = sumCorrect
             xTitle = SOLVERS_TITLE
             yTitle = NAMES_TITLE
-        fig = go.Figure(go.Bar(
-            x=xValues,
-            y=yValues,
-            marker_color=colorList,
-            orientation=orientation,
-            text=textList,
-            textposition='outside',
-        ))
+        fig = go.Figure(data=[
+            go.Bar(
+                x=xValues,
+                y=yValues,
+                marker_color=colorList,
+                orientation=orientation,
+                text=textList,
+                textposition='outside',
+            ),
+        ])
         xAxisDict = {
             'title': xTitle,
         }

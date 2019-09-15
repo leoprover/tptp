@@ -22,14 +22,18 @@ class CliToolCompetition(CliToolBase):
     def getInstance(cls):
         return cls('competition')
 
-    def draw(self, results:List[SolverResult]):
+    def drawCallback(self, results:List[SolverResult]):
         if len(results) % len(self.competitionInstance.solvers()) == 0:
-            unsoundSolverSet = set(map(lambda r: r.call.solver, filter(lambda r: not r.matches().isSound(), results)))
-            unsoundString = ['unsound']*len(unsoundSolverSet)
-            unsoundSolvers = {k:v for k in unsoundSolverSet for v in unsoundString}
-            chart = self.competitionInstance.getDefaultSolvedFigure()(self.competitionInstance.name(), results)
-            fig = chart.figure(solvedAxisWidth=len(self.competitionInstance.problems()), text=unsoundSolvers)
-            fig.show()
+            self.draw(results)
+
+    def draw(self, results:List[SolverResult]):
+        unsoundSolverSet = set(map(lambda r: r.call.solver, filter(lambda r: not r.matches().isSound(), results)))
+        unsoundString = ['unsound']*len(unsoundSolverSet)
+        unsoundSolvers = {k:v for k in unsoundSolverSet for v in unsoundString}
+        
+        chart = self.competitionInstance.getDefaultSolvedFigure()(self.competitionInstance.name(), results=results)
+        fig = chart.figure(solvedAxisWidth=len(self.competitionInstance.problems()), text=unsoundSolvers)
+        fig.show()
 
     def run(self, args):
         configurationModulePath = Path(args.configuration)
@@ -46,8 +50,14 @@ class CliToolCompetition(CliToolBase):
             outputDir=Path(args.output) if args.output else None
         )
         self.competitionInstance = competitionInstance
-        competitionInstance.addResultCallback(self.draw)
+
+        if args.liveplot:
+            competitionInstance.addResultCallback(self.drawCallback)
+        
         competitionInstance.run()
+
+        if args.finalplot:
+            self.draw(competitionInstance.results())
 
     def parseArgs(self, toolSubParser):
         toolSubParser.add_argument('configuration', 
@@ -68,4 +78,12 @@ class CliToolCompetition(CliToolBase):
         toolSubParser.add_argument('--output', 
             help='dictionary where the output of the competition and all solvers should be stored',
             required=False,
+        )
+        toolSubParser.add_argument('--liveplot', 
+            help='uses plotly to print the competition state on a regular interval',
+            action='store_const', default=False, const=True,
+        )
+        toolSubParser.add_argument('--finalplot', 
+            help='uses plotly to print the final competition result',
+            action='store_const', default=False, const=True,
         )

@@ -110,6 +110,9 @@ class SZSStatusMatch():
     def isSound(self):
         return self._sound
 
+    def isUnsound(self):
+        return not self._sound
+
 UNSOUND = SZSStatusMatch("unsound", correct=False, sound=False)
 NO_SUCCESS = SZSStatusMatch("no success", correct=False, sound=True)
 CORRECT = SZSStatusMatch("correct", correct=True, sound=True)

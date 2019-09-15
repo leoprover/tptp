@@ -73,9 +73,10 @@ class CASC(Competition):
 
         match = szsResult.matches(szsExspected)
 
-        output = '% SZS status {result} which is {state}'.format(
+        output = '% SZS status {result} which is {state} took {t}s'.format(
             result=result,
             state=match,
+            t=int(result.wc),
         )
         if self._colored:
             print('{color}{output}{reset}'.format(

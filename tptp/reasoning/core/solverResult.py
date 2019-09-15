@@ -26,11 +26,11 @@ class SolverResult:
         return self._call
 
     @property
-    def cpu(self):
+    def cpu(self) -> float:
         return self._cpu
 
     @property
-    def wc(self):
+    def wc(self) -> float:
         return self._wc
 
     @property
@@ -48,8 +48,8 @@ class SolverResult:
         if available
         :return:
         """
-        return self.call.problem.szs()
+        return self.call.problem.szsStatus
 
     def matches(self):
-        return self.szsStatus.matches(self.call.problem.szs())
+        return self.szsStatus.matches(self.call.problem.szsStatus)
 
