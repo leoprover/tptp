@@ -116,13 +116,24 @@ class CASC(Competition):
         self._running = True
         wcLimit = self.wcLimit()
         self.addResultCallback(self.resultString)
+
+        if self._outputDir:
+            with open(self._outputDir / ("results.csv"), "a") as f:
+                print('problem, exspected, ' + ', '.join(map(lambda s: str(s), self._solvers)), file=f)
+
         for p in self._problems:
+            rs = []
             for s in self._solvers:
                 call = s.call(p, timeout=wcLimit)
                 print('% SZS status Started for {}'.format(call))
 
                 result = call.run()
+                rs.append(result.szsStatus)
                 self.addResult(result)
+
+            if self._outputDir:
+                with open(self._outputDir / ("results.csv"), "a") as f:
+                    print(p.name + ', ' + str(p.szsStatus) + ', ' + ', '.join(map(lambda s: str(s), rs)), file=f)
         self._running = False
         
     def results(self) -> List[SolverResult]:
