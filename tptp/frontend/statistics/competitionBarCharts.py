@@ -36,52 +36,78 @@ class SolvedPerSolverChart(SolvedChart):
         text:Dict[Solver,str]=None
     ):
         dictResults = createDict(self.results)
-        solvers = sortSolvers(dictResults.keys())
 
         solvers = sortSolvers(dictResults.keys())
-        solverNames = list(map(lambda s: s.name + s.version if s.version else s.name, solvers))
-        sums = list(map(lambda s: len(list(filter(lambda r: r.matches().isCorrect(), dictResults[s]))), solvers))
+        numSolvers = len(solvers)
+        
+        solverNames = []
+        numCorrect = []
+        numIncorrect = []
+        textListCorrect = []
+        textListIncorrect = []
+        for s in solvers:
+            _num = len(dictResults[s])
+            _numCorrect = len(list(filter(lambda r: r.matches().isCorrect(), dictResults[s])))
+            _isUnsound = len(list(filter(lambda r: r.matches().isUnsound(), dictResults[s]))) > 0
+            _timeCorrect = sum(map(lambda r: r.wc if r.matches().isCorrect() else 0, dictResults[s]))
+
+            solverNames.append(str(s))
+            numCorrect.append(_numCorrect)
+            numIncorrect.append(_num - _numCorrect)
+
+            textListCorrect.append('{m:02d}:{s:02d}.{ms:04d}'.format(
+                m=int(_timeCorrect/60),
+                s=int(_timeCorrect)%60,
+                ms=int(_timeCorrect*1000)%1000,
+            ))
+            textListIncorrect.append('{state}'.format(
+                state='unsound' if _isUnsound else ''
+            ))
 
         NAMES_TITLE = 'number of correct solutions'
         SOLVERS_TITLE = None
 
-
-
-        if text:
-            textList = list(map(lambda s: text[s] if s in text else None, solvers))
-        else:
-            textList = None
-        textPositions = list(map(lambda s: 'inside' if s > 0 else 'outside', sums))
-
         if coloring:
             colorList = list(map(lambda s: coloring[s], solvers))
         else:
-            if len(solvers) <= len(DECENT_COLORS):
+            if numSolvers <= len(DECENT_COLORS):
                 colorList = DECENT_COLORS
-            elif len(solvers) <= len(NAMED_CSS_COLORS):
+            elif numSolvers <= len(NAMED_CSS_COLORS):
                 colorList = NAMED_CSS_COLORS
             else:
-                colorList = list(range(len(solvers)))
+                colorList = list(range(numSolvers))
 
         if orientation == 'h':
-            xValues = sums
-            yValues = solverNames
+            xValuesCorrect = numCorrect
+            yValuesCorrect = solverNames
+            xValuesIncorrect = numIncorrect
+            yValuesIncorrect = solverNames
             xTitle = NAMES_TITLE
             yTitle = SOLVERS_TITLE
         else:
-            xValues = solverNames,
-            yValues = sums
+            xValuesCorrect = solverNames
+            yValuesCorrect = numCorrect
+            xValuesIncorrect = solverNames
+            yValuesIncorrect= numIncorrect
             xTitle = SOLVERS_TITLE
             yTitle = NAMES_TITLE
 
         fig = go.Figure(data=[
             go.Bar(
-                x=xValues,
-                y=yValues,
+                x=xValuesCorrect,
+                y=yValuesCorrect,
                 marker_color=colorList,
                 orientation=orientation,
-                text=textList,
-                textposition=textPositions,
+                text=textListCorrect,
+                textposition='inside',
+            ),
+            go.Bar(
+                x=xValuesIncorrect,
+                y=yValuesIncorrect,
+                marker_color=['lightgray']*numSolvers,
+                orientation=orientation,
+                text=textListIncorrect,
+                textposition='inside',
             ),
         ])
         xAxisDict = {
@@ -91,6 +117,7 @@ class SolvedPerSolverChart(SolvedChart):
             'title': yTitle,
         }
         fig.update_layout(
+            barmode='stack',
             title=self.name,
             showlegend=False,
             xaxis=xAxisDict,
