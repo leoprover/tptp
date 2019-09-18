@@ -101,3 +101,12 @@ $ python3 -m tptp competition competition-test/definition.py
 % Satisfiable for Sat1.cnf expecting Satisfiable with MySolver -t 60s which is correct
 ...
 ```
+
+## Docker
+```
+$ python3 -m tptp docker build --solver-name leo3
+```
+
+```
+$ python3 -m tptp docker run --solver-name leo3 --problem problems/SYN001+1.p
+```

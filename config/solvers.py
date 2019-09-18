@@ -33,4 +33,11 @@ SOLVERS = (
         'name': 'gaveup-dummy',
         'command': './solvers/gaveup-dummy.sh %s -t %d',
     },
+    {
+        'type': 'docker',
+        'name': 'leo3',
+        'pretty-name': 'Leo III', 
+        'version': '1.3', 
+        'docker-config': './config/docker/leo3--1.3'
+    },
 )

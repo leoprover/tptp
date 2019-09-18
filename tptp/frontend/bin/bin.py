@@ -5,6 +5,7 @@ from .toolEncoder import CliToolEncoder
 from .toolSystemOnTPTP import CliToolSystemOnTPTP
 from .toolLocalSolver import CliToolLocalSolver
 from .toolCompetition import CliToolCompetition
+from .toolDocker import CliToolDocker
 from .toolBase import CliToolBase
 
 
@@ -25,7 +26,7 @@ def parse_args(tools:List[CliToolBase]):
 
 
 def main():
-    activatedTools = [CliToolSystemOnTPTP, CliToolCompetition, CliToolLocalSolver, CliToolEncoder]
+    activatedTools = [CliToolSystemOnTPTP, CliToolCompetition, CliToolLocalSolver, CliToolEncoder, CliToolDocker]
     args, actionList = parse_args(activatedTools)
     actionList[args.tool](args)
 
