@@ -35,7 +35,7 @@ class CliToolCompetition(CliToolBase):
                 timeDict[r.call.solver] += r.wc
         textDict = {k:str(round(v,4)) + unsoundSolvers.get(k,'') for (k,v) in timeDict.items()}
         chart = self.competitionInstance.getDefaultSolvedFigure()(self.competitionInstance.name(), results=results)
-        fig = chart.figure(solvedAxisWidth=len(self.competitionInstance.problems()), text=textDict)
+        fig = chart.figure(solvedAxisWidth=len(self.competitionInstance.problems()), text=textDict, solverAxisTitle='number of correct solutions')
         fig.show()
 
     def run(self, args):

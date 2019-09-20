@@ -184,6 +184,13 @@ class SZSStatus():
             return SZSStatus._longNames[status]
         raise UnknownSZSStatusError('\"' + status + '\" is not a valid SZS status.')
 
+    @staticmethod
+    def getOrUnknown(status:str):
+        try:
+            return SZSStatus.get(status)
+        except:
+            return SZSStatus.UNK
+
 # SUCCESS
 # layer 7
 SZSStatus.ETH = SZSStatus.EquivalentTheorem                               = SZSStatus("ETH", "EquivalentTheorem",)

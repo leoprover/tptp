@@ -9,15 +9,18 @@ from .dummyResults import dummyResults
 
 
 class SolvedChart:
-    def __init__(self, name:str, *, results:Iterable[SolverResult]):
+    def __init__(self, name:str, results:Iterable[SolverResult]):
         self.name = name
         self.results = results
 
     def __repr__(self):
         return self.__class__.__name__ + self.name
 
+    def trace(self):
+        raise NotImplementedError()
+
     def figure(self):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def saveFigure(self, width=None, height=None):
         pass # TODO
@@ -26,26 +29,22 @@ class SolvedPerSolverChart(SolvedChart):
     """
     Every solver possesses one bar that accounts for successfully solved problems.
     """
-    def __init__(self, name: str, *, results: Iterable[SolverResult]):
+    def __init__(self, name: str, results: Iterable[SolverResult]):
         super().__init__(name, results=results)
 
-    def figure(self, *,
-        orientation='h', 
-        solvedAxisWidth:int=None, 
-        coloring:Dict[Solver,str]=None, 
-        text:Dict[Solver,str]=None
-    ):
-        dictResults = createDict(self.results)
-        solvers = sortSolvers(dictResults.keys())
+    def trace(self,
+           orientation:str='h',
+           coloring:Dict[Solver,str]=None,
+           text:Dict[Solver,str]=None,
+        ):
+        LEGAL_ORIENTATIONS = ['h', 'v']
+        if not orientation in LEGAL_ORIENTATIONS:
+            raise Exception('Illegal orientation parameter. Choices are:', str(LEGAL_ORIENTATIONS))
 
+        dictResults = createDict(self.results)
         solvers = sortSolvers(dictResults.keys())
         solverNames = list(map(lambda s: s.name + s.version if s.version else s.name, solvers))
         sums = list(map(lambda s: len(list(filter(lambda r: r.matches().isCorrect(), dictResults[s]))), solvers))
-
-        NAMES_TITLE = 'number of correct solutions'
-        SOLVERS_TITLE = None
-
-
 
         if text:
             textList = list(map(lambda s: text[s] if s in text else None, solvers))
@@ -66,24 +65,39 @@ class SolvedPerSolverChart(SolvedChart):
         if orientation == 'h':
             xValues = sums
             yValues = solverNames
-            xTitle = NAMES_TITLE
-            yTitle = SOLVERS_TITLE
         else:
             xValues = solverNames,
             yValues = sums
-            xTitle = SOLVERS_TITLE
-            yTitle = NAMES_TITLE
 
-        fig = go.Figure(data=[
-            go.Bar(
+        trace = go.Bar(
                 x=xValues,
                 y=yValues,
                 marker_color=colorList,
                 orientation=orientation,
                 text=textList,
                 textposition=textPositions,
-            ),
+            )
+        return trace
+
+    def figure(self,
+           orientation:str='h',
+           solvedAxisWidth:int=None,
+           coloring:Dict[Solver,str]=None,
+           text:Dict[Solver,str]=None,
+           solverAxisTitle:str=None,
+           solvedAxisTitle:str=None
+        ):
+        fig =  go.Figure(data=[
+            self.trace(orientation=orientation, coloring=coloring, text=text),
         ])
+
+        if orientation == 'h':
+            xTitle = solvedAxisTitle
+            yTitle = solverAxisTitle
+        else:
+            xTitle = solverAxisTitle
+            yTitle = solvedAxisTitle
+
         xAxisDict = {
             'title': xTitle,
         }
