@@ -2,20 +2,20 @@ from typing import List
 import re
 
 from ..encoding.encodingChooser import getEncoder
-from ..core import Problem, TPTPInputLanguage, SZSStatus, UnknownSZSStatusError
+from ..core import Problem, TPTPDialect, SZSStatus, UnknownSZSStatusError
 from .core import Solver, SolverCall, SolverType, SolverResult
 
 from ..utils.concurrent.localProcess import LocalProcess
 
 class LocalSolver(Solver):
     def __init__(self, name: str, *,
-        command: str, 
-        version: str= None,
-        prettyName: str= None,
-        encoding: str=None,
-        inputLanguages: List[TPTPInputLanguage]= [],
-        applications: List[SolverType]= [],
-    ):
+                 command: str,
+                 version: str= None,
+                 prettyName: str= None,
+                 encoding: str=None,
+                 inputLanguages: List[TPTPDialect]= [],
+                 applications: List[SolverType]= [],
+                 ):
         super().__init__(
             name=name, 
             prettyName=prettyName,

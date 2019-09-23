@@ -6,21 +6,21 @@ import requests
 import re
 
 from tptp.encoding.encodingChooser import getEncoder
-from ..core import Problem, TPTPInputLanguage, SZSStatus
+from ..core import Problem, TPTPDialect, SZSStatus
 from .core import Solver, SolverCall, SolverType, SolverResult
 
 from ..utils.concurrent.httpRequest import AsyncPostRequest
 
 class SystemOnTPTPSolver(Solver):
     def __init__(self, name: str, *,
-        systemOnTPTPName: str,
-        command: str, 
-        version: str= None,
-        prettyName: str= None,
-        encoding: str=None,
-        inputLanguages: List[TPTPInputLanguage]= [],
-        applications: List[SolverType]= [],
-    ):
+                 systemOnTPTPName: str,
+                 command: str,
+                 version: str= None,
+                 prettyName: str= None,
+                 encoding: str=None,
+                 inputLanguages: List[TPTPDialect]= [],
+                 applications: List[SolverType]= [],
+                 ):
         super().__init__(
             name=name,
             prettyName=prettyName,
@@ -101,7 +101,7 @@ def getSolvers() -> List[SystemOnTPTPSolver]:
             formats = applicationText.split(', for ',1)[1].split(' ')
         except:
             formats = applicationText.split('For ',1)[1].split(' ')
-        solverFormats.append(list(map(lambda f: TPTPInputLanguage(f), filter(lambda a: len(a) != 0, formats))))
+        solverFormats.append(list(map(lambda f: TPTPDialect(f), filter(lambda a: len(a) != 0, formats))))
 
     ret = []
     for name, command, formats, applications in zip(solverNames,solverCommands,solverFormats,solverApplications):
