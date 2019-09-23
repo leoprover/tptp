@@ -1,4 +1,4 @@
-from .frontend.bin import bin
+from .frontend.bin import __main__
 
 if __name__ == '__main__':
-   bin.main()
+   __main__.main()

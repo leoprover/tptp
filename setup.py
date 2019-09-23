@@ -6,7 +6,7 @@ HERE = pathlib.Path(__file__).parent
 README = (HERE / "README.md").read_text()
 
 setup(name='tptp',
-    version='0.0.3-dev1',
+    version='0.0.1',
     description='A library for handling TPTP related input and systems',
     classifiers=[
         'Programming Language :: Python :: 3.5',
@@ -25,7 +25,7 @@ setup(name='tptp',
     #include_package_data=True,
     entry_points={
     'console_scripts': [
-        'tptp = tptp.frontend.bin.bin:main'
+        'tptp = tptp.frontend.bin.__main__:main'
         ]
     }
 )
