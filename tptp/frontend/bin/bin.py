@@ -1,4 +1,5 @@
 import argparse
+import sys
 from typing import List
 
 from .toolEncoder import CliToolEncoder
@@ -21,6 +22,9 @@ def parse_args(tools:List[CliToolBase]):
         actionList[instance.name()] = instance.run
 
     args = topLevelParser.parse_args()
+    if not 'tool' in args: # check if the attribute 'tool' is available in args; otherwise an exception would be raised
+        topLevelParser.print_help()
+        sys.exit(1)
     return (args, actionList)
 
 
