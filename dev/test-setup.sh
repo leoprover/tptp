@@ -1,6 +1,8 @@
 #!/bin/sh
 # run some basic exec-tests
 
+cd ..
+
 # check if all listing are ok
 python3 -m tptp local list-solvers
 python3 -m tptp system-on-tptp list-solvers

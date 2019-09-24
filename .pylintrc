@@ -30,7 +30,7 @@ limit-inference-results=100
 # List of plugins (as comma separated values of python modules names) to load,
 # usually to register additional checkers.
 load-plugins=
-    pylint-tptp/pylint-trailing-comma,
+    dev/pylint-tptp/pylint-trailing-comma,
 
 # Pickle collected data for later comparisons.
 persistent=yes

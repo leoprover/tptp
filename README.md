@@ -14,12 +14,12 @@ python3 -m tptp local list-solvers
 
 Run Leo III.
 ```
-$ python3 -m tptp local run --solver-name leo3 --problem problems/SYN001+1.p --timeout 60
+$ python3 -m tptp local run --solver-name leo3 --problem contrib/problems/SYN001+1.p --timeout 60
 ```
 
 Run cvc4
 ```
-$ python3 -m tptp local run --solver-name cvc4 --problem problems/SYN001+1.p --timeout 60
+$ python3 -m tptp local run --solver-name cvc4 --problem contrib/problems/SYN001+1.p --timeout 60
 ```
 
 ### Run System-on-TPTP:
@@ -31,17 +31,17 @@ $ python3 -m tptp system-on-tptp list-solvers
 
 Run Leo III.
 ```
-$ python3 -m tptp system-on-tptp request --solver-name "Leo-III---1.4" --solver-command "run_Leo-III %s %d" --problem "problems/SYN001+1.p" 
+$ python3 -m tptp system-on-tptp request --solver-name "Leo-III---1.4" --solver-command "run_Leo-III %s %d" --problem "contrib/problems/SYN001+1.p" 
 ```
 
 ### Test the competition mode
 ```
-$ python3 -m tptp competition competition-test/definition.py
+$ python3 -m tptp competition examples/competitions/sat-solver-competition/definition.py
 ```
 
 Run with more output. Good for error tracking.
 ```
-$ python3 -m tptp competition competition-test/definition.py --verbose
+$ python3 -m tptp competition examples/competitions/sat-solver-competition/definition.py --verbose
 ```
 
 ## Making a solver TPTP ready
@@ -71,7 +71,7 @@ Any prove or prove-model should additionally be printed on the stdout in the fol
 ### Test your solver
 To test your solve add it to our test competition, which can be found at
 ```
-competition-test/definition.py
+examples/competitions/sat-solver-competition/definition.py
 ```
 
 Here you add your solver to the ```SOLVERS``` constant
@@ -96,7 +96,7 @@ This will ensure that your solver
 
 Running our test competition should now list your solver.
 ```
-$ python3 -m tptp competition competition-test/definition.py
+$ python3 -m tptp competition examples/competitions/sat-solver-competition/definition.py
 ...
 % Satisfiable for Sat1.cnf expecting Satisfiable with MySolver -t 60s which is correct
 ...
