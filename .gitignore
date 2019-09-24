@@ -1,5 +1,8 @@
+# IDE
+.idea
+
 # Byte-compiled / optimized / DLL files
-__pycache__/
+*__pycache__/
 *.py[cod]
 
 # C extensions
@@ -42,6 +45,7 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *,cover
+.pytest_cache/
 
 # Translations
 *.mo
