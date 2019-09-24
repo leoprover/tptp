@@ -5,7 +5,7 @@ from importlib.machinery import SourceFileLoader
 from typing import List, Callable, Iterable
 from pathlib import Path
 
-from ..frontend.statistics.competitionBarCharts import SolvedPerSolverChart
+from ..frontend.plots.competitionBarCharts import SolvedPerSolverChart
 from ..core import SZSStatus
 from .competition import Competition
 from ..reasoning import Solver, SolverResult, loadSolvers
