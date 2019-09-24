@@ -1,11 +1,10 @@
 from typing import List
 from lxml import html
-import argparse
-from pathlib import Path
 import requests
 import re
 
-from tptp.encoding.encodingChooser import getEncoder
+from ..core import UnknownSZSStatusError
+from ..encoding.encodingChooser import getEncoder
 from ..core import Problem, TPTPDialect, SZSStatus
 from .core import Solver, SolverCall, SolverType, SolverResult
 
@@ -70,6 +69,9 @@ class SystemOnTPTPSolver(Solver):
             timeout=timeout
         )
 
+class SystemOnTPTPMalfunctionError(Exception):
+    pass
+
 def getSolvers() -> List[SystemOnTPTPSolver]:
     URL_SYSTEM_ON_TPTP = 'http://www.tptp.org/cgi-bin/SystemOnTPTP' # TODO put this into a config
     site = requests.get(URL_SYSTEM_ON_TPTP)
@@ -96,12 +98,14 @@ def getSolvers() -> List[SystemOnTPTPSolver]:
             apps.append(SolverType('prover'))
         if 'finder' in applicationText.lower():
             apps.append(SolverType('model finder'))
-        solverApplications.append(apps)
+        # solverApplications.append(apps) # TODO when top-level capability architecture is fixed
+        solverApplications.append(None)
         try:
             formats = applicationText.split(', for ',1)[1].split(' ')
         except:
             formats = applicationText.split('For ',1)[1].split(' ')
-        solverFormats.append(list(map(lambda f: TPTPDialect(f), filter(lambda a: len(a) != 0, formats))))
+        # solverFormats.append(list(map(lambda f: TPTPDialect(f), filter(lambda a: len(a) != 0, formats)))) # TODO when top-level capability architecture is fixed
+        solverFormats.append(None)
 
     ret = []
     for name, command, formats, applications in zip(solverNames,solverCommands,solverFormats,solverApplications):
@@ -160,27 +164,28 @@ class SystemOnTPTPSolverCall(SolverCall):
         self._request = AsyncPostRequest(URL_SYSTEM_ON_TPTP_FORM, payload, self._calculatedTimeout)
         self._request.start()
 
+    SYSTEM_ON_TPTP_RESULT_PATTERN = re.compile(r'^% RESULT:.*says\s+(\S+)\s+-\s+CPU\s+=\s+(\d+\.\d+)\s+WC\s+=\s+(\d+\.\d+).*', re.MULTILINE)
     def result(self) -> SystemOnTPTPSolverResult:
         if not self._started:
-            raise Exception("Reasoning call has not been started.")
+            raise Exception('Reasoning call has not been started.')
         if self._request.cancelled():
-            raise Exception("Reasoning call has been cancelled.")
+            raise Exception('Reasoning call has been cancelled.')
         if not self._request.done():
-            raise Exception("Reasoning call has not been finished.")
+            raise Exception('Reasoning call has not been finished.')
         # % RESULT: SOT_WZbJQt - Leo-III---1.4 says Theorem - CPU = 0.00 WC = 0.04
         response = self._request.result()
-
-        results = re.findall('^% RESULT:.*', response.text , re.M)
-        if results == []: # TODO better error reporting
-            raise Exception("Response not interpretable: Could not find RESULT token.\n" + response.text)
-        elif len(results) > 1:
-            raise Exception("Response not interpretable: More than one RESULT token.\n" + response.text)
-        szs = re.search('(?:.*says )(.*)(?: - CPU.*)', results[0], re.I).group(1)
-        cpu = float(re.search('(?:.*CPU = )(.*)(?: WC.*)', results[0], re.I).group(1))
-        wc = float(re.search('(?:.*WC = )(\S*)(?: .*)', results[0], re.I).group(1))
+        print(response.text)
+        try:
+            szs, cpu, wc = re.search(SystemOnTPTPSolverCall.SYSTEM_ON_TPTP_RESULT_PATTERN, response.text).groups()
+        except:
+            raise SystemOnTPTPMalfunctionError('Response not interpretable: Could not match RESULT line.\n' + response.text)
+        try:
+            szsSingleton = SZSStatus.get(szs)
+        except UnknownSZSStatusError:
+            raise SystemOnTPTPMalfunctionError('Response not interpretable: SZS status ' + szs + ' is not interpretable.\n' + response.text)
 
         return SystemOnTPTPSolverResult(self, 
-            szs=SZSStatus.get(szs), 
+            szs=szsSingleton,
             cpu=cpu, 
             wc=wc,
             response=response,
