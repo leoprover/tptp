@@ -2,7 +2,7 @@ import zipfile
 from pathlib import Path
 
 
-def zip(sourcePath: Path, targetPath: Path):
+def createZipArchive(sourcePath: Path, targetPath: Path):
     with zipfile.ZipFile(targetPath, "w", compression=zipfile.ZIP_DEFLATED) as zipDescriptor:
         if sourcePath.is_file():
             if sourcePath == targetPath:
