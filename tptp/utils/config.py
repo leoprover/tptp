@@ -22,9 +22,9 @@ class Config(dict):
     def getInitialConfig(path:Path):
         return Config(path, {
             'awsDefaults': {
-                'region': 'eu-central-1',
-                's3SolverBucket': None,
-                'role': None,
+                'region': 'eu-central-1', # required by awsLambdaSolver
+                's3SolverBucket': None, # optional for awsLambdaSolver
+                'roleArn': None, # optional for awsLambdaSolver
             },
             'awsLambdaSolvers': [],
             'dockerSolvers': [],
@@ -33,6 +33,9 @@ class Config(dict):
         })
 
     def save(self):
+        if not self._path.exists():
+            self._path.parent.mkdir(exist_ok=True)
+            self._path.touch()
         self._path.write_text(json.dumps(self), encoding='utf-8')
 
 
@@ -43,8 +46,9 @@ BASE_PATH = Path(
 )
 CONFIG_DIR_PATH = BASE_PATH / 'tptp_python_lib'
 CONFIG_FILE_PATH = CONFIG_DIR_PATH / 'config.json'
-CONFIG = None # This is
+CONFIG = None # This is the configuration dict accessed throughout the library
 try:
     CONFIG = Config.load(CONFIG_FILE_PATH)
 except:
     CONFIG = Config.getInitialConfig(CONFIG_FILE_PATH)
+
