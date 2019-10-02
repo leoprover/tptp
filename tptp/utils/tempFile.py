@@ -20,5 +20,5 @@ class TempFileManager():
     def namedFile() -> Path:
         tempfile =  TempFileManager.namedFileDescriptor(delete=False)
         tempfile.close()
-        return Path(tempfile)
+        return Path(tempfile.name)
 
